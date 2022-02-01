@@ -17,6 +17,10 @@ function App() {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v11',
+      maxBounds: [
+        [-6.354204, 49.894995],
+        [2.066974, 55.765636]
+      ],
       center: [lng, lat],
       zoom: zoom
     });
