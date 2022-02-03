@@ -29,7 +29,7 @@ function Map() {
             "type": "raster",
             "tiles": [ OSserviceUrl + "/Light_3857/{z}/{x}/{y}.png?key=" + OSapiKey ],
             "tileSize": 256,
-            "maxzoom": 20
+            // "maxzoom": 20
           }
         },
         "layers": [{
@@ -87,12 +87,13 @@ function Map() {
 
   return (
     <div>
-      <div className="sidebar">
-        Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-      </div>
-      <div ref={mapContainer} className="map-container" />
+      <div ref={mapContainer} className="Map-container" />
     </div>
   );
 }
 
 export default Map;
+
+// <div className="sidebar">
+//   Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
+// </div>

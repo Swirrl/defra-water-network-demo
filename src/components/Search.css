@@ -1,0 +1,15 @@
+.Search-container {
+  padding: 1rem;
+  background: #5b5b5b;
+}
+
+.Search-input {
+  margin-right: 0.5rem;
+  border-radius: 4px;
+  padding: .5rem;
+  width: 300px;
+}
+
+.Search-submit-button {
+  padding: 0.5rem;
+}
