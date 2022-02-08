@@ -1,6 +1,6 @@
 .Search-container {
   padding: 1rem;
-  background: #5b5b5b;
+  background: #dbdbdb;
 }
 
 .Search-input {
@@ -12,4 +12,25 @@
 
 .Search-submit-button {
   padding: 0.5rem;
+}
+
+.Search-results-list {
+  padding: 1rem 0.5rem 0rem 0.5rem;
+}
+
+.Search-results-list ul {
+  padding: 0;
+}
+
+.Search-results-list li {
+  list-style: none;
+}
+
+.Search-results-list-item {
+  margin-top: 0.3rem;
+}
+
+.Search-results-list-item a {
+  margin-top: 0.3rem;
+  color: blue;
 }

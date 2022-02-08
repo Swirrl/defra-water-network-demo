@@ -4,12 +4,10 @@ import logo from './logo.svg';
 import './App.css';
 
 import Map from "./components/Map"
-import Search from "./components/Search"
 
 function App() {
   return (
     <div>
-      <Search />
       <Map />
       <footer>
       </footer>
