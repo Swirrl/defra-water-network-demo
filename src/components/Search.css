@@ -1,36 +1,15 @@
-.Search-container {
-  padding: 1rem;
-  background: #dbdbdb;
-}
-
-.Search-input {
-  margin-right: 0.5rem;
-  border-radius: 4px;
-  padding: .5rem;
-  width: 300px;
-}
-
-.Search-submit-button {
-  padding: 0.5rem;
-}
-
-.Search-results-list {
-  padding: 1rem 0.5rem 0rem 0.5rem;
-}
-
 .Search-results-list ul {
   padding: 0;
-}
-
-.Search-results-list li {
   list-style: none;
 }
 
-.Search-results-list-item {
-  margin-top: 0.3rem;
+.Search-results-list-item button {
+  text-align: left;
 }
 
-.Search-results-list-item a {
-  margin-top: 0.3rem;
-  color: blue;
+.CollapsiblePane-button {
+  position: absolute;
+  z-index: 1;
+  top: 1rem;
+  left: 1rem;
 }

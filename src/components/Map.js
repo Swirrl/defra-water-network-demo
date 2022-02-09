@@ -16,6 +16,11 @@ function Map() {
   const OSapiKey = process.env.REACT_APP_OS_API_KEY;
   const OSserviceUrl = 'https://api.os.uk/maps/raster/v1/zxy';
 
+  const setLngLat = ([lng, lat]) => {
+    setLng(lng.toFixed(4));
+    setLat(lat.toFixed(4));
+  }
+
   useEffect(() => {
     if (map.current) return; // initialize map only once
 
@@ -80,22 +85,17 @@ function Map() {
   useEffect(() => {
     if (!map.current) return; // wait for map to initialize
     map.current.on('move', () => {
-      setLng(map.current.getCenter().lng.toFixed(4));
-      setLat(map.current.getCenter().lat.toFixed(4));
+      setLngLat([map.current.getCenter().lng, map.current.getCenter().lat])
       setZoom(map.current.getZoom().toFixed(2));
     });
   });
 
   return (
-    <div>
+    <>
       <Search map={map} />
       <div ref={mapContainer} className="Map-container" />
-    </div>
+    </>
   );
 }
 
 export default Map;
-
-// <div className="sidebar">
-//   Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-// </div>

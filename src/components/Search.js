@@ -1,4 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import Offcanvas from 'react-bootstrap/Offcanvas';
 
 import proj4 from 'proj4';
 import './Search.css';
@@ -8,11 +11,15 @@ import './Search.css';
 
 proj4.defs('EPSG:27700', '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +towgs84=446.448,-125.157,542.06,0.15,0.247,0.842,-20.489 +units=m +no_defs');
 
-function Search(props) {
+function Search({map}) {
   const nameServiceUrl = 'https://api.os.uk/search/names/v1';
 
   const [results, setResults] = useState([])
   const [query, setQuery] = useState("");
+
+  const [show, setShow] = useState(true);
+  const handleClose = () => {setShow(false);};
+  const handleShow = () => {setShow(true);};
 
   const OSapiKey = process.env.REACT_APP_OS_API_KEY;
   const OSplacesServiceBase = 'https://api.os.uk/search/names/v1/find' ;
@@ -32,10 +39,11 @@ function Search(props) {
     return proj4('EPSG:27700', 'EPSG:4326', coords);
   }
 
-  const panMap = (entry) => {
+  const selectEntry = (entry) => {
     const coords = OSGridToLatLong([entry.GEOMETRY_X, entry.GEOMETRY_Y]);
-    props.map.current.panTo(coords);
-    props.map.current.setZoom(13);
+    map.current.setCenter(coords);
+    map.current.setZoom(14);
+    handleClose();
     setResults([]);
   };
 
@@ -44,10 +52,11 @@ function Search(props) {
       <li
         key={entry.ID}
         className="Search-results-list-item" >
-      <a
-        href="#"
-        onClick={() => { panMap(entry) }}
-      >{entry.NAME1}, {entry.REGION}</a>
+        <Button variant="link"
+                onClick={() => { selectEntry(entry) }}
+                className="p-0 mb-2">
+          {entry.NAME1}, {entry.REGION}
+        </Button>
       </li>);
   };
 
@@ -60,34 +69,39 @@ function Search(props) {
   const resultsList = () => {
     return (
       results.length > 0 &&
-      <div className="Search-results-list">
+      <div className="Search-results-list mt-3">
         {results.length === 15 && <em>Showing first 15 results</em>}
-        <ul>{resultsToListItems()}</ul>
+        <ul className="mt-2">{resultsToListItems()}</ul>
       </div>
     );
   };
 
   return (
-    <div className="Search-container">
-      <form action="/"
-            method="get"
-            autoComplete="off"
-            onSubmit={onSubmit}>
-        <label htmlFor="header-search">
-          <span className="visually-hidden">Search for a place</span>
-        </label>
-        <input
-          type="text"
-          id="header-search"
-          placeholder="Search for a place"
-          name="s"
-          className="Search-input"
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <button type="submit" className="Search-submit-button">Go</button>
-      </form>
-      {resultsList()}
-    </div>
+    <>
+      <Button variant="primary"
+              onClick={handleShow}
+              className="CollapsiblePane-button">Search ▶
+      </Button>
+      <Offcanvas show={show} onHide={handleClose}>
+        <Offcanvas.Header closeButton>
+          <Offcanvas.Title>Water Network API</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body>
+
+          <Form onSubmit={onSubmit}>
+            <Form.Group controlId="search-query" className="mb-3">
+              <Form.Label visuallyHidden="true">Search for a place</Form.Label>
+              <Form.Control type="text"
+                            placeholder="Search for a place"
+                            onChange={(e) => setQuery(e.target.value)}/>
+            </Form.Group>
+            <Button variant="primary" type="submit">Submit</Button>
+            {resultsList()}
+          </Form>
+
+        </Offcanvas.Body>
+      </Offcanvas>
+    </>
   );
 }
 
