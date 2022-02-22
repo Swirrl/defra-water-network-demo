@@ -4,6 +4,8 @@ import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-load
 import Search from "./Search"
 import './Map.css';
 
+import { setupEmptyOverlays } from "../utils/data";
+
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 
 function Map() {
@@ -21,6 +23,7 @@ function Map() {
     setLat(lat.toFixed(4));
   }
 
+  // Initialize map
   useEffect(() => {
     if (map.current) return; // initialize map only once
 
@@ -53,38 +56,21 @@ function Map() {
       zoom: zoom,
     });
 
-    map.current.dragRotate.disable() // Disable map rotation using right click + drag. map.current.touchZoomRotate.disableRotation(); // Disable map rotation using touch rotation gesture.
-    // Add navigation control (excluding compass button) to the map.
-    map.current.addControl(new mapboxgl.NavigationControl({
-      showCompass: false
-    }));
+    map.current.on("load", () => {
+      map.current.dragRotate.disable();
+      map.current.touchZoomRotate.disableRotation();
+      map.current.addControl(new mapboxgl.NavigationControl({
+        showCompass: false
+      }));
 
-    (async () => {
-      const airports = await fetch('https://demo.ldproxy.net/zoomstack/collections/airports/items?limit=100', {
-        headers: {
-          'Accept': 'application/geo+json'
-        }
-      }).then(response => response.json());
-
-      map.current.addSource('airports', {
-        type: 'geojson',
-        data: airports
-      });
-
-      map.current.addLayer({
-        'id': 'airports',
-        'type': 'symbol',
-        'source': 'airports',
-        "layout": {
-          "icon-image": "airport-15"
-        }
-      });
-    })();
+      setupEmptyOverlays(map.current);
+    })
   });
 
   useEffect(() => {
     if (!map.current) return; // wait for map to initialize
-    map.current.on('move', () => {
+
+    map.current.on("move", () => {
       setLngLat([map.current.getCenter().lng, map.current.getCenter().lat])
       setZoom(map.current.getZoom().toFixed(2));
     });

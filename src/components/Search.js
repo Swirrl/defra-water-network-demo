@@ -3,6 +3,8 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 
+import { getHydroNodesNearby, getWatercourseLinks } from "../utils/data";
+
 import proj4 from 'proj4';
 import './Search.css';
 
@@ -36,12 +38,17 @@ function Search({map}) {
     return proj4('EPSG:27700', 'EPSG:4326', coords);
   }
 
-  const selectEntry = (entry) => {
+  const selectEntry = async (entry) => {
     const coords = OSGridToLatLong([entry.GEOMETRY_X, entry.GEOMETRY_Y]);
     map.current.setCenter(coords);
     map.current.setZoom(14);
     handleClose();
     setResults([]);
+    const hydroNode = await getHydroNodesNearby(coords);
+    const watercourseLinks = await getWatercourseLinks(hydroNode);
+
+    map.current.getSource("hydroNodes").setData(hydroNode);
+    map.current.getSource("watercourseLinks").setData(watercourseLinks);
   };
 
   const listItem = (entry) => {
