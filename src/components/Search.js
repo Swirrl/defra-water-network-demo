@@ -30,7 +30,7 @@ function Search({map}) {
   const selectEntry = async (entry) => {
     const coords = OSGridToLatLong([entry.GEOMETRY_X, entry.GEOMETRY_Y]);
     map.current.setCenter(coords);
-    map.current.setZoom(16);
+    map.current.setZoom(14);
     handleClose();
     setResults([]);
     const mapBounds = getMapBoundingBox(map.current);
