@@ -3,15 +3,15 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 
-import { getHydroNodesNearby, getWatercourseLinks } from "../utils/data";
+import { getFeaturesInBoundingBox } from "../utils/data";
+import { getOSNames, OSGridToLatLong } from "../utils/os-names";
+import { getMapBoundingBox } from "../utils/map";
 
-import proj4 from 'proj4';
 import './Search.css';
 
 /* Copied from OS example:
    https://labs.os.uk/public/os-data-hub-examples/os-names-api/find-example-placename */
 
-proj4.defs('EPSG:27700', '+proj=tmerc +lat_0=49 +lon_0=-2 +k=0.9996012717 +x_0=400000 +y_0=-100000 +ellps=airy +towgs84=446.448,-125.157,542.06,0.15,0.247,0.842,-20.489 +units=m +no_defs');
 
 function Search({map}) {
   const [results, setResults] = useState([])
@@ -21,21 +21,10 @@ function Search({map}) {
   const handleClose = () => {setShow(false);};
   const handleShow = () => {setShow(true);};
 
-  const OSapiKey = process.env.REACT_APP_OS_API_KEY;
-  const OSNamesServiceBase = 'https://api.os.uk/search/names/v1/find' ;
-
   const onSubmit = async (event) => {
     event.preventDefault();
-    const url = OSNamesServiceBase +
-                "?maxresults=15" +
-                "&key=" + OSapiKey +
-                "&query=" + query
-    const places = await fetch(url).then(response => response.json());
+    const places = await getOSNames(query);
     setResults(places.results);
-  }
-
-  const OSGridToLatLong = (coords) => {
-    return proj4('EPSG:27700', 'EPSG:4326', coords);
   }
 
   const selectEntry = async (entry) => {
@@ -44,11 +33,15 @@ function Search({map}) {
     map.current.setZoom(16);
     handleClose();
     setResults([]);
-    const hydroNode = await getHydroNodesNearby(coords);
-    const watercourseLinks = await getWatercourseLinks(hydroNode);
-
-    map.current.getSource("hydroNodes").setData(hydroNode);
-    map.current.getSource("watercourseLinks").setData(watercourseLinks);
+    const mapBounds = getMapBoundingBox(map.current);
+    await getFeaturesInBoundingBox("HydroNode", mapBounds)
+      .then((hydroNodes) => {
+        map.current.getSource("hydroNodes").setData(hydroNodes)
+      });
+    await getFeaturesInBoundingBox("WatercourseLink", mapBounds)
+      .then((watercourseLinks) => {
+        map.current.getSource("watercourseLinks").setData(watercourseLinks);
+      });
   };
 
   const listItem = (entry) => {
