@@ -4,7 +4,7 @@ import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-load
 import Search from "./Search"
 import './Map.css';
 
-import { setupEmptyOverlays } from "../utils/data";
+import { setupEmptyOverlays, setupLayerPopups } from "../utils/map";
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 
@@ -21,7 +21,7 @@ function Map() {
   const setLngLat = ([lng, lat]) => {
     setLng(lng.toFixed(4));
     setLat(lat.toFixed(4));
-  }
+  };
 
   // Initialize map
   useEffect(() => {
@@ -64,7 +64,8 @@ function Map() {
       }));
 
       setupEmptyOverlays(map.current);
-    })
+      setupLayerPopups(map.current);
+    });
   });
 
   useEffect(() => {
