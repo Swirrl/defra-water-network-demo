@@ -1,8 +1,13 @@
-const waterNetworkAPIBase = "https://defra-water-network-dev.publishmydata.com/water-network/api/v1";
+const waterNetworkAPIBase = "https://defra-water-network-prod.publishmydata.com/water-network/api/v1";
+const waterNetworkAPIKey = process.env.REACT_APP_WATER_NETWORK_API_KEY;
 
 async function getURL(url) {
+  const headers = {
+    "Authorization": `Basic ${waterNetworkAPIKey}`
+  };
+
   return await fetch(url, {method: "GET",
-                                     // headers: headers
+                           headers: headers
                           }).then(response => response.json());
 }
 
@@ -35,7 +40,6 @@ export async function getFeaturesInBoundingBox(collection, mapBounds) {
   const url = waterNetworkAPIBase +
         "/collections/" + collection + "/items" +
         "?bbox=" + mapBounds.join(",");
-  // const headers = {"Authorization": "Basic dGVzdEB0ZXN0LmNvbTo0OTdhNTcyMmI2OWYzNGY4YTAzMTQwMDEyNDZhYWIyMzgwYjQ3ZjFk"};
 
   let response = await getURL(url);
   return getBBoxPages(response);
