@@ -47,38 +47,58 @@ export function setupEmptyOverlays(map) {
   });
 }
 
-function getHydroNodeCategory({hydroNodeCategory}) {
-  return hydroNodeCategory.split("/").pop();
+function getLastURLSegment(url) {
+  return url.split("/").pop();
 }
 
-function hydroNodePropertiesToHTML({properties}) {
+function toTableCells(displayProps) {
+  return Object.entries(displayProps).map(([key, value]) => {
+    return(
+    `<tr>
+       <th>${key}</th>
+       <td>${displayProps[key]}</td>
+     </tr>`);
+  }).join("");
+}
+
+function popupTableHTML(displayProps) {
   return (
     `<table>
        <caption style="font-weight: bold; caption-side: top">HydroNode</caption>
-       <tr>
-         <th>ID</th>
-         <td>${properties.id}</td>
-       </tr>
-       <tr>
-         <th>Category</th>
-         <td>${getHydroNodeCategory(properties)}</td>
-       </tr>
+        ${toTableCells(displayProps)}
      </table>`);
 }
 
+function hydroNodePropertiesToHTML({properties}) {
+  const displayProps = {
+    "ID": properties.id,
+    "Category": getLastURLSegment(properties.hydroNodeCategory)};
+
+  return popupTableHTML(displayProps);
+}
+
 function watercourseLinkPropertiesToHTML({properties}) {
-  return (
-    `<table>
-       <caption style="font-weight: bold; caption-side: top">WatercourseLink</caption>
-       <tr>
-         <th>ID</th>
-         <td>${properties.id}</td>
-       </tr>
-       <tr>
-         <th>Length</th>
-         <td>${properties.length}</td>
-       </tr>
-     </table>`);
+  const displayProps = {
+    "ID": properties.id,
+  };
+
+  if (properties.length) {
+    displayProps["Length"] = properties.length;
+  };
+
+  if (properties.flowDirection) {
+    displayProps["Flow direction"] = getLastURLSegment(properties.flowDirection);
+  };
+
+  if (properties.catchmentName) {
+    displayProps["Catchment name"] = properties.catchmentName;
+  };
+
+  if (properties.catchmentId) {
+    displayProps["Catchment ID"] = properties.catchmentId;
+  }
+
+  return popupTableHTML(displayProps);
 }
 
 export function setupLayerPopups(map) {

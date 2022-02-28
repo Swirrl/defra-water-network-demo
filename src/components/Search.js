@@ -14,7 +14,7 @@ import './Search.css';
 
 
 function Search({map}) {
-  const [results, setResults] = useState([])
+  const [results, setResults] = useState([]);
   const [query, setQuery] = useState("");
 
   const [show, setShow] = useState(true);
@@ -25,7 +25,7 @@ function Search({map}) {
     event.preventDefault();
     const places = await getOSNames(query);
     setResults(places.results);
-  }
+  };
 
   const selectEntry = async (entry) => {
     const coords = OSGridToLatLong([entry.GEOMETRY_X, entry.GEOMETRY_Y]);
@@ -36,7 +36,7 @@ function Search({map}) {
     const mapBounds = getMapBoundingBox(map.current);
     await getFeaturesInBoundingBox("HydroNode", mapBounds)
       .then((hydroNodes) => {
-        map.current.getSource("hydroNodes").setData(hydroNodes)
+        map.current.getSource("hydroNodes").setData(hydroNodes);
       });
     await getFeaturesInBoundingBox("WatercourseLink", mapBounds)
       .then((watercourseLinks) => {
@@ -60,8 +60,9 @@ function Search({map}) {
   const resultsToListItems = () => {
     return results.map((result) => {
       const entry = result.GAZETTEER_ENTRY;
-      return listItem(entry)
-  })};
+      return listItem(entry);
+    });
+  };
 
   const resultsList = () => {
     return (
