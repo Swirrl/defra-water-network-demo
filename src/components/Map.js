@@ -4,7 +4,8 @@ import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-load
 import Search from "./Search"
 import './Map.css';
 
-import { setupEmptyOverlays, setupLayerPopups } from "../utils/map";
+import { setupEmptyOverlays } from "../utils/map";
+import { setupLayerPopups } from "../utils/popups";
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 

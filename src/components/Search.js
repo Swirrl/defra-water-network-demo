@@ -3,7 +3,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 
-import { displayFeaturesInMapViewport } from "../utils/data";
+import { displayFeaturesInMapViewport } from "../utils/water-network-data";
 import { getOSNames, OSGridToLatLong } from "../utils/os-names";
 
 import './Search.css';

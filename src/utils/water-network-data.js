@@ -11,11 +11,11 @@ const getURL = async (url) => {
   return await fetch(url, {method: "GET",
                            headers: headers
                           }).then(response => response.json());
-}
+};
 
 const getNextPageLink = (response) => {
   return response.links.find((link) => link.rel === "next");
-}
+};
 
 const mergeFeatures = (response, nextPageResponse) => {
   const allFeatures = response.features.concat(...nextPageResponse.features);
@@ -24,7 +24,7 @@ const mergeFeatures = (response, nextPageResponse) => {
     features: allFeatures,
     numberReturned: response.numberReturned + nextPageResponse.numberReturned
   };
-}
+};
 
 const getBBoxPages = async (response) => {
   let nextPageLink = getNextPageLink(response);
@@ -36,7 +36,7 @@ const getBBoxPages = async (response) => {
   } else {
     return response;
   }
-}
+};
 
 const getFeaturesInBoundingBox = async (collection, mapBounds) => {
   const url = waterNetworkAPIBase +
@@ -45,7 +45,7 @@ const getFeaturesInBoundingBox = async (collection, mapBounds) => {
 
   let response = await getURL(url);
   return getBBoxPages(response);
-}
+};
 
 const bboxPolygon = ([swLng, swLat, neLng, neLat]) => {
   return {
