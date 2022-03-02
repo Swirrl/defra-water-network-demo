@@ -3,8 +3,10 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 
-import { displayFeaturesInMapViewport } from "../utils/water-network-data";
-import { getOSNames, OSGridToLatLong } from "../utils/os-names";
+import { displayWaterNetworkFeaturesInMapViewport } from "../utils/water-network-data";
+import { displayMonitoringSitesFeaturesInMapViewport } from "../utils/monitoring-sites-data";
+import { getOSNames } from "../utils/os-names";
+import { OSGridToLatLng } from "../utils/coords";
 
 import './Search.css';
 
@@ -23,12 +25,13 @@ function Search({map}) {
   };
 
   const selectEntry = async (entry) => {
-    const coords = OSGridToLatLong([entry.GEOMETRY_X, entry.GEOMETRY_Y]);
+    const coords = OSGridToLatLng([entry.GEOMETRY_X, entry.GEOMETRY_Y]);
     map.current.setCenter(coords);
     map.current.setZoom(14);
     handleClose();
     setResults([]);
-    await displayFeaturesInMapViewport(map.current);
+    await displayWaterNetworkFeaturesInMapViewport(map.current);
+    await displayMonitoringSitesFeaturesInMapViewport(map.current);
   };
 
   const listItem = (entry) => {

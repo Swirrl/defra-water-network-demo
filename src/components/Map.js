@@ -30,8 +30,6 @@ function Map() {
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      // style: OSserviceUrl + '/resources/styles?key=' + OSapiKey,
-      // style: 'mapbox://styles/mapbox/streets-v11',
       style: {
         "version": 8,
         "sources": {

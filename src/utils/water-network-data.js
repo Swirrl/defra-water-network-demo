@@ -1,4 +1,4 @@
-import { getMapBoundingBox } from "../utils/map";
+import { getMapBoundingBox, bboxPolygon } from "../utils/map";
 
 const waterNetworkAPIBase = "https://defra-water-network-prod.publishmydata.com/water-network/api/v1";
 const waterNetworkAPIKey = process.env.REACT_APP_WATER_NETWORK_API_KEY;
@@ -8,8 +8,7 @@ const getURL = async (url) => {
     "Authorization": `Basic ${waterNetworkAPIKey}`
   };
 
-  return await fetch(url, {method: "GET",
-                           headers: headers
+  return await fetch(url, {method: "GET", headers: headers
                           }).then(response => response.json());
 };
 
@@ -47,21 +46,7 @@ const getFeaturesInBoundingBox = async (collection, mapBounds) => {
   return getBBoxPages(response);
 };
 
-const bboxPolygon = ([swLng, swLat, neLng, neLat]) => {
-  return {
-    "type": "Feature",
-    "geometry": {
-      "type": "LineString",
-      "coordinates": [[swLng, swLat],
-                      [swLng, neLat],
-                      [neLng, neLat],
-                      [neLng, swLat],
-                      [swLng, swLat]]
-    }
-  };
-};
-
-export const displayFeaturesInMapViewport = async (map) => {
+export const displayWaterNetworkFeaturesInMapViewport = async (map) => {
   const mapBounds = getMapBoundingBox(map);
   const box = bboxPolygon(mapBounds);
   map.getSource("bbox").setData(box);

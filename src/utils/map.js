@@ -1,22 +1,20 @@
-import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
-
 export const getMapBoundingBox = (map) => {
   const {_sw, _ne} = map.getBounds();
   return [_sw.lng, _sw.lat, _ne.lng, _ne.lat];
 };
 
-export const setupEmptyOverlays = (map) => {
-  map.addSource("bbox", {
+const addGeoJSONSource = (map, name) => {
+  map.addSource(name, {
     type: "geojson",
     data: {
-      type: "Feature",
-      geometry: {
-        type: "Polygon",
-        coordinates: []
-      }
+      type: "FeatureCollection",
+      features: []
     }
   });
+};
 
+export const setupEmptyOverlays = (map) => {
+  addGeoJSONSource(map, "bbox");
   map.addLayer({
     id: "bbox",
     type: "line",
@@ -31,14 +29,7 @@ export const setupEmptyOverlays = (map) => {
     }
   });
 
-  map.addSource("watercourseLinks", {
-    type: "geojson",
-    data: {
-      type: "FeatureCollection",
-      features: []
-    }
-  });
-
+  addGeoJSONSource(map, "watercourseLinks");
   map.addLayer({
     id: "watercourseLinks",
     type: "line",
@@ -53,14 +44,7 @@ export const setupEmptyOverlays = (map) => {
     }
   });
 
-  map.addSource("hydroNodes", {
-    type: "geojson",
-    data: {
-      type: "FeatureCollection",
-      features: []
-    }
-  });
-
+  addGeoJSONSource(map, "hydroNodes");
   map.addLayer({
     id: "hydroNodes",
     type: "circle",
@@ -70,4 +54,31 @@ export const setupEmptyOverlays = (map) => {
       "circle-radius": 5
     }
   });
+
+  addGeoJSONSource(map, "biosysSites");
+  map.addLayer({
+    id: "biosysSites",
+    type: "symbol",
+    source: "biosysSites",
+    layout: {
+      "icon-image": "marker-15"
+    },
+    paint: {
+      "icon-color": "orange"
+    }
+  });
+};
+
+export const bboxPolygon = ([swLng, swLat, neLng, neLat]) => {
+  return {
+    "type": "Feature",
+    "geometry": {
+      "type": "LineString",
+      "coordinates": [[swLng, swLat],
+                      [swLng, neLat],
+                      [neLng, neLat],
+                      [neLng, swLat],
+                      [swLng, swLat]]
+    }
+  };
 };
