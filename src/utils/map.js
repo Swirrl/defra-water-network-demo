@@ -1,11 +1,36 @@
 import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 
-export function getMapBoundingBox(map) {
+export const getMapBoundingBox = (map) => {
   const {_sw, _ne} = map.getBounds();
   return [_sw.lng, _sw.lat, _ne.lng, _ne.lat];
-}
+};
 
-export function setupEmptyOverlays(map) {
+export const setupEmptyOverlays = (map) => {
+  map.addSource("bbox", {
+    type: "geojson",
+    data: {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: []
+      }
+    }
+  });
+
+  map.addLayer({
+    id: "bbox",
+    type: "line",
+    source: "bbox",
+    layout: {
+      "line-join": "round",
+      "line-cap": "round"
+    },
+    paint: {
+      "line-color": "#c13634",
+      "line-width": 2
+    }
+  });
+
   map.addSource("watercourseLinks", {
     type: "geojson",
     data: {
@@ -15,14 +40,14 @@ export function setupEmptyOverlays(map) {
   });
 
   map.addLayer({
-    "id": "watercourseLinks",
-    "type": "line",
-    "source": "watercourseLinks",
-    "layout": {
+    id: "watercourseLinks",
+    type: "line",
+    source: "watercourseLinks",
+    layout: {
       "line-join": "round",
       "line-cap": "round"
     },
-    "paint": {
+    paint: {
       "line-color": "#0079c4",
       "line-width": 4
     }
@@ -37,21 +62,21 @@ export function setupEmptyOverlays(map) {
   });
 
   map.addLayer({
-    "id": "hydroNodes",
-    "type": "circle",
-    "source": "hydroNodes",
-    "paint": {
+    id: "hydroNodes",
+    type: "circle",
+    source: "hydroNodes",
+    paint: {
       "circle-color": "#004e7f",
       "circle-radius": 5
     }
   });
-}
+};
 
-function getLastURLSegment(url) {
+const getLastURLSegment = (url) =>{
   return url.split("/").pop();
-}
+};
 
-function toTableCells(displayProps) {
+const toTableCells = (displayProps) =>{
   return Object.entries(displayProps).map(([key, value]) => {
     return(
     `<tr>
@@ -59,25 +84,25 @@ function toTableCells(displayProps) {
        <td>${displayProps[key]}</td>
      </tr>`);
   }).join("");
-}
+};
 
-function popupTableHTML(displayProps) {
+const popupTableHTML = (title, displayProps) => {
   return (
     `<table>
-       <caption style="font-weight: bold; caption-side: top">HydroNode</caption>
+       <caption style="font-weight: bold; caption-side: top">${title}</caption>
         ${toTableCells(displayProps)}
      </table>`);
-}
+};
 
-function hydroNodePropertiesToHTML({properties}) {
+const hydroNodePropertiesToHTML = ({properties}) =>{
   const displayProps = {
     "ID": properties.id,
     "Category": getLastURLSegment(properties.hydroNodeCategory)};
 
-  return popupTableHTML(displayProps);
-}
+  return popupTableHTML("Hydro Node", displayProps);
+};
 
-function watercourseLinkPropertiesToHTML({properties}) {
+const watercourseLinkPropertiesToHTML = ({properties}) =>{
   const displayProps = {
     "ID": properties.id,
   };
@@ -98,10 +123,10 @@ function watercourseLinkPropertiesToHTML({properties}) {
     displayProps["Catchment ID"] = properties.catchmentId;
   }
 
-  return popupTableHTML(displayProps);
-}
+  return popupTableHTML("Watercourse Link", displayProps);
+};
 
-export function setupLayerPopups(map) {
+export const setupLayerPopups = (map) => {
   map.on("click", "hydroNodes", (e) => {
     e.originalEvent.preventDefault();
     const coords = e.features[0].geometry.coordinates;
@@ -144,4 +169,4 @@ export function setupLayerPopups(map) {
   map.on("mouseleave", "watercourseLinks", () => {
     map.getCanvas().style.cursor = "";
   });
-}
+};

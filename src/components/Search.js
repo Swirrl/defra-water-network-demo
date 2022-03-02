@@ -3,15 +3,10 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 
-import { getFeaturesInBoundingBox } from "../utils/data";
+import { displayFeaturesInMapViewport } from "../utils/data";
 import { getOSNames, OSGridToLatLong } from "../utils/os-names";
-import { getMapBoundingBox } from "../utils/map";
 
 import './Search.css';
-
-/* Copied from OS example:
-   https://labs.os.uk/public/os-data-hub-examples/os-names-api/find-example-placename */
-
 
 function Search({map}) {
   const [results, setResults] = useState([]);
@@ -33,15 +28,7 @@ function Search({map}) {
     map.current.setZoom(14);
     handleClose();
     setResults([]);
-    const mapBounds = getMapBoundingBox(map.current);
-    await getFeaturesInBoundingBox("HydroNode", mapBounds)
-      .then((hydroNodes) => {
-        map.current.getSource("hydroNodes").setData(hydroNodes);
-      });
-    await getFeaturesInBoundingBox("WatercourseLink", mapBounds)
-      .then((watercourseLinks) => {
-        map.current.getSource("watercourseLinks").setData(watercourseLinks);
-      });
+    await displayFeaturesInMapViewport(map.current);
   };
 
   const listItem = (entry) => {

@@ -38,7 +38,7 @@ function Map() {
             "type": "raster",
             "tiles": [ OSserviceUrl + "/Light_3857/{z}/{x}/{y}.png?key=" + OSapiKey ],
             "tileSize": 256,
-            // "maxzoom": 20
+            "maxzoom": 17
           }
         },
         "layers": [{

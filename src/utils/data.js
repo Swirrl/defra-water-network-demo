@@ -1,7 +1,9 @@
+import { getMapBoundingBox } from "../utils/map";
+
 const waterNetworkAPIBase = "https://defra-water-network-prod.publishmydata.com/water-network/api/v1";
 const waterNetworkAPIKey = process.env.REACT_APP_WATER_NETWORK_API_KEY;
 
-async function getURL(url) {
+const getURL = async (url) => {
   const headers = {
     "Authorization": `Basic ${waterNetworkAPIKey}`
   };
@@ -11,11 +13,11 @@ async function getURL(url) {
                           }).then(response => response.json());
 }
 
-function getNextPageLink(response) {
+const getNextPageLink = (response) => {
   return response.links.find((link) => link.rel === "next");
 }
 
-function mergeFeatures(response, nextPageResponse) {
+const mergeFeatures = (response, nextPageResponse) => {
   const allFeatures = response.features.concat(...nextPageResponse.features);
   return {
     ...nextPageResponse,
@@ -24,7 +26,7 @@ function mergeFeatures(response, nextPageResponse) {
   };
 }
 
-async function getBBoxPages(response) {
+const getBBoxPages = async (response) => {
   let nextPageLink = getNextPageLink(response);
 
   if (nextPageLink) {
@@ -36,7 +38,7 @@ async function getBBoxPages(response) {
   }
 }
 
-export async function getFeaturesInBoundingBox(collection, mapBounds) {
+const getFeaturesInBoundingBox = async (collection, mapBounds) => {
   const url = waterNetworkAPIBase +
         "/collections/" + collection + "/items" +
         "?bbox=" + mapBounds.join(",");
@@ -44,3 +46,33 @@ export async function getFeaturesInBoundingBox(collection, mapBounds) {
   let response = await getURL(url);
   return getBBoxPages(response);
 }
+
+const bboxPolygon = ([swLng, swLat, neLng, neLat]) => {
+  return {
+    "type": "Feature",
+    "geometry": {
+      "type": "LineString",
+      "coordinates": [[swLng, swLat],
+                      [swLng, neLat],
+                      [neLng, neLat],
+                      [neLng, swLat],
+                      [swLng, swLat]]
+    }
+  };
+};
+
+export const displayFeaturesInMapViewport = async (map) => {
+  const mapBounds = getMapBoundingBox(map);
+  const box = bboxPolygon(mapBounds);
+  map.getSource("bbox").setData(box);
+
+  await getFeaturesInBoundingBox("HydroNode", mapBounds)
+    .then((hydroNodes) => {
+      map.getSource("hydroNodes").setData(hydroNodes);
+    });
+
+  await getFeaturesInBoundingBox("WatercourseLink", mapBounds)
+    .then((watercourseLinks) => {
+      map.getSource("watercourseLinks").setData(watercourseLinks);
+    });
+};
