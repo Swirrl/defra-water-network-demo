@@ -58,15 +58,47 @@ export const setupEmptyOverlays = (map) => {
   addGeoJSONSource(map, "biosysSites");
   map.addLayer({
     id: "biosysSites",
-    type: "symbol",
+    type: "circle",
     source: "biosysSites",
-    layout: {
-      "icon-image": "marker-15"
-    },
     paint: {
-      "icon-color": "orange"
+      "circle-color": "#379102",
+      "circle-radius": 8
     }
   });
+
+  addGeoJSONSource(map, "waterQualitySites");
+  map.addLayer({
+    id: "waterQualitySites",
+    type: "circle",
+    source: "waterQualitySites",
+    paint: {
+      "circle-color": "#379102",
+      "circle-radius": 8
+    }
+  });
+
+  addGeoJSONSource(map, "riverLevelSites");
+  map.addLayer({
+    id: "riverLevelSites",
+    type: "circle",
+    source: "riverLevelSites",
+    paint: {
+      "circle-color": "#d18700",
+      "circle-radius": 8
+    }
+  });
+
+  addGeoJSONSource(map, "freshwaterSites");
+  map.addLayer({
+    id: "freshwaterSites",
+    type: "circle",
+    source: "freshwaterSites",
+    paint: {
+      "circle-color": "#720e93",
+      "circle-radius": 8
+    }
+  });
+
 };
 
 export const bboxPolygon = ([swLng, swLat, neLng, neLat]) => {

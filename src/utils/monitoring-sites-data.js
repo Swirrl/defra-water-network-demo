@@ -37,13 +37,13 @@ const waterQualitySitesQuery = ([sw, ne]) => {
 
 const riverLevelSitesQuery = ([sw, ne]) => {
   return `
-    SELECT ?s ?easting ?northing ?label WHERE
+    SELECT ?s ?easting ?northing ?label WHERE {
     GRAPH <http://environment.data.gov.uk/linked-data/graph/river-level-monitoring-stations> {
     { ?s <http://data.ordnancesurvey.co.uk/ontology/spatialrelations/easting> ?easting ;
          <http://data.ordnancesurvey.co.uk/ontology/spatialrelations/northing> ?northing ;
          <http://www.w3.org/2000/01/rdf-schema#label> ?label .` +
     bboxFilter(sw, ne) +
-    `}}`;
+    `}}}`;
 };
 
 const fishPopulationFreshwaterSites = ([sw, ne]) => {
@@ -75,17 +75,33 @@ const mapBoundsToEastingNorthing = ([swLng, swLat, nwLng ,neLat]) => {
   return [latLngToOSGrid([swLng, swLat]), latLngToOSGrid([nwLng, neLat])];
 };
 
+const queryTemplates = {
+  "biosysSites": biosysSitesQuery,
+  "waterQualitySites": waterQualitySitesQuery,
+  "riverLevelSites": riverLevelSitesQuery,
+  "freshwaterSites": fishPopulationFreshwaterSites
+};
+
+const getQuery = (layer, corners) => {
+  const queryTemplate = queryTemplates[layer];
+  return queryTemplate(corners);
+};
+
+const setSitesInBoundingBox = async (map, corners, layer) => {
+  const query = getQuery(layer, corners);
+  return await getSitesInBoundingBox(query)
+    .then((sites) => {
+      map.getSource(layer).setData(sites);
+    });
+};
+
+
 export const displayMonitoringSitesFeaturesInMapViewport = async (map) => {
   const mapBounds = getMapBoundingBox(map);
   const corners = mapBoundsToEastingNorthing(mapBounds);
 
-  await getSitesInBoundingBox(biosysSitesQuery(corners))
-    .then((sites) => {
-      map.getSource("biosysSites").setData(sites);
-    });
-
-  // await getFeaturesInBoundingBox("WatercourseLink", mapBounds)
-  //   .then((watercourseLinks) => {
-  //     map.getSource("watercourseLinks").setData(watercourseLinks);
-  //   });
+  await setSitesInBoundingBox(map, corners, "biosysSites");
+  await setSitesInBoundingBox(map, corners, "waterQualitySites");
+  await setSitesInBoundingBox(map, corners, "riverLevelSites");
+  await setSitesInBoundingBox(map, corners, "freshwaterSites");
 };
