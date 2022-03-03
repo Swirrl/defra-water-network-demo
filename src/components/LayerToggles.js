@@ -21,7 +21,7 @@ function LayerToggles ({map}) {
     setExpanded(!isExpanded);
     const symbol = isExpanded ?  "▶" : "◀" ;
     setButtonSymbol(symbol);
-  }
+  };
 
   const layersToSetters = {
     "biosysSites": setBiosysChecked,
@@ -50,7 +50,7 @@ function LayerToggles ({map}) {
                        id="hydroNodes"
                        onChange={toggleLayer}
                        checked={hydroNodesChecked} />
-          <Form.Switch label="WatercourseLinks"
+          <Form.Switch label="Watercourse Links"
                        id="watercourseLinks"
                        onChange={toggleLayer}
                        checked={watercourseLinksChecked} />
