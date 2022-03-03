@@ -44,6 +44,21 @@ export const setupEmptyOverlays = (map) => {
     }
   });
 
+  addGeoJSONSource(map, "highlightWatercourseLink");
+  map.addLayer({
+    id: "highlightWatercourseLink",
+    type: "line",
+    source: "highlightWatercourseLink",
+    layout: {
+      "line-join": "round",
+      "line-cap": "round"
+    },
+    paint: {
+      "line-color": "red",
+      "line-width": 8
+    }
+  });
+
   addGeoJSONSource(map, "hydroNodes");
   map.addLayer({
     id: "hydroNodes",
@@ -98,7 +113,6 @@ export const setupEmptyOverlays = (map) => {
       "circle-radius": 8
     }
   });
-
 };
 
 export const bboxPolygon = ([swLng, swLat, neLng, neLat]) => {

@@ -1,5 +1,7 @@
 import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 
+import { highlighestNearestWatercourseLink } from "../utils/nearest-wc-link-to-site";
+
 const getLastURLSegment = (url) =>{
   return url.split("/").pop();
 };
@@ -95,7 +97,7 @@ export const setupLayerPopups = (map) => {
                        "waterQualitySites",
                        "riverLevelSites",
                        "freshwaterSites"]) {
-    map.on("click", layer, (e) => {
+    map.on("click", layer, async (e) => {
       if (e.originalEvent.defaultPrevented) return;
       e.originalEvent.preventDefault();
 
@@ -103,6 +105,7 @@ export const setupLayerPopups = (map) => {
       const text = sitePropertiesToHTML(e.features[0]);
 
       newPopup(coords, text, map);
+      await highlighestNearestWatercourseLink(coords, map);
     });
   }
 
