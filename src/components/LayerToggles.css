@@ -5,6 +5,24 @@
   left: 1rem;
 }
 
+.LayerToggles-collapse-button {
+  margin-top: 0.5rem;
+}
+
+.LayerToggles-collapsed {
+  width: 60px;
+}
+
+.LayerToggles-collapsed .form-check-label {
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
 #biosysSites:checked {
   background-color: #379102;
   border-color: #379102;

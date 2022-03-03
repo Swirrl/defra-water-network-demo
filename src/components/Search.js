@@ -68,7 +68,7 @@ function Search({map}) {
     <>
       <Button variant="primary"
               onClick={handleShow}
-              className="CollapsiblePane-button">Search ▶
+              className="Search-button">Search ▶
       </Button>
       <Offcanvas show={show} onHide={handleClose}>
         <Offcanvas.Header closeButton>

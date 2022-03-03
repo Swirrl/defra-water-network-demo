@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import Card from 'react-bootstrap/Card';
 import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
 
 import './LayerToggles.css';
 
@@ -13,10 +14,14 @@ function LayerToggles ({map}) {
   const [hydroNodesChecked, setHydroNodes] = useState(true);
   const [watercourseLinksChecked, setWatercourseLinks] = useState(true);
 
-  const getVisibility = (layer) => {
-    const x = map.current.getLayoutProperty(layer, "visibility");
-    return x
-  };
+  const [isExpanded, setExpanded] = useState(true);
+  const [buttonSymbol, setButtonSymbol] = useState("◀");
+
+  const toggleExpanded = () => {
+    setExpanded(!isExpanded);
+    const symbol = isExpanded ?  "▶" : "◀" ;
+    setButtonSymbol(symbol);
+  }
 
   const layersToSetters = {
     "biosysSites": setBiosysChecked,
@@ -39,7 +44,7 @@ function LayerToggles ({map}) {
 
   return (
     <Card className="LayerToggles">
-      <Card.Body>
+      <Card.Body className={isExpanded ? "LayerToggles-expanded" : "LayerToggles-collapsed"}>
         <Form>
           <Form.Switch label="Hydro Nodes"
                        id="hydroNodes"
@@ -66,6 +71,11 @@ function LayerToggles ({map}) {
                        onChange={toggleLayer}
                        checked={freshwaterChecked} />
         </Form>
+        <Button variant="secondary"
+                size="sm"
+                onClick={toggleExpanded}
+                className="LayerToggles-collapse-button">{buttonSymbol}</Button>
+
       </Card.Body>
     </Card>
   );
