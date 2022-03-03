@@ -57,16 +57,8 @@ const fishPopulationFreshwaterSites = ([sw, ne]) => {
     `}`;
 };
 
-const displayAllMonitoringSites = async (easting, northing) => {
-  console.log("display??");
-};
-
 const getSitesInBoundingBox = async (query) => {
   const url = requestURL(query);
-  // const basicAuth = process.env.REACT_APP_DEFRA_PMD_BASIC_AUTH_CREDS;
-  // const headers = {
-  //   Authorization: `Basic ${btoa(basicAuth)}`
-  // };
   const csv = await fetch(url).then(response => response.text());
   return csvToGeoJSON(csv);
 };
@@ -94,7 +86,6 @@ const setSitesInBoundingBox = async (map, corners, layer) => {
       map.getSource(layer).setData(sites);
     });
 };
-
 
 export const displayMonitoringSitesFeaturesInMapViewport = async (map) => {
   const mapBounds = getMapBoundingBox(map);
