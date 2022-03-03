@@ -2,6 +2,9 @@ import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
 
 import Search from "./Search"
+import SearchHereButton from "./SearchHereButton"
+import LayerToggles from "./LayerToggles"
+
 import './Map.css';
 
 import { setupEmptyOverlays } from "../utils/map";
@@ -79,9 +82,11 @@ function Map() {
   return (
     <>
       <Search map={map} />
+      <LayerToggles map={map} />
       <div ref={mapContainer} className="Map-container" />
     </>
   );
+  // <SearchHereButton map={map} />
 }
 
 export default Map;

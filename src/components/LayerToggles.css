@@ -1,0 +1,36 @@
+.LayerToggles {
+  position: absolute;
+  z-index: 1;
+  bottom: 3rem;
+  left: 1rem;
+}
+
+#biosysSites:checked {
+  background-color: #379102;
+  border-color: #379102;
+}
+
+#waterQualitySites:checked {
+  background-color: #31ede6;
+  border-color: #31ede6;
+}
+
+#riverLevelSites:checked {
+  background-color: #d18700;
+  border-color: #d18700;
+}
+
+#freshwaterSites:checked {
+  background-color: #720e93;
+  border-color: #720e93;
+}
+
+#hydroNodes:checked{
+  background-color: #004e7f;
+  border-color: #004e7f;
+}
+
+#watercouseLinks:checked{
+  background-color: #0079c4;
+  border-color: #0079c4;
+}
