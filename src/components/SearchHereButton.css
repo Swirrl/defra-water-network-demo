@@ -1,0 +1,13 @@
+.SearchHereButton {
+  position: absolute;
+  z-index: 1;
+  top: 4rem;
+  left: 1rem;
+}
+
+.tootip-disabled {
+  /* position: absolute; */
+  /* z-index: 1; */
+  /* top: 4rem; */
+  /* left: 1rem; */
+}

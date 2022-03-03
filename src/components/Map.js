@@ -82,11 +82,11 @@ function Map() {
   return (
     <>
       <Search map={map} />
+      <SearchHereButton map={map} />
       <LayerToggles map={map} />
       <div ref={mapContainer} className="Map-container" />
     </>
   );
-  // <SearchHereButton map={map} />
 }
 
 export default Map;
