@@ -27,52 +27,36 @@ function SearchHereButton ({map}) {
         setDisabled(true);
       }
     }, 60))
-  })
-
+  });
 
   const renderTooltip = () => (
     <Tooltip id="tooltip-disabled">
       Zoom in more to enable searching for all features within the currently visible portion of the map
     </Tooltip>
-  )
+  );
 
-  return (
-    // <OverlayTrigger
-    //   placement="right"
-    //   overlay={renderTooltip}>
-    //   <span className="d-inline-block">
-    //     <Button style={isDisabled ? { pointerEvents: 'none' } : {}}
-    //             disabled={isDisabled}
-    //             variant="secondary"
-    //             className="SearchHereButton">
-    //       Search Here
-    //     </Button>
-    //   </span>
-    // </OverlayTrigger>
-
-    <Button style={isDisabled ? { pointerEvents: 'none' } : {}}
+  const renderButton = () => (
+    <Button style={isDisabled ? { pointerEvents: "none" } : {}}
             onClick={renderMapItems}
             disabled={isDisabled}
             variant="secondary"
-            className="SearchHereButton">
+            className={isDisabled ? "" : "SearchHereButton"}>
       Search Here
     </Button>
+  );
 
+  return (
+    isDisabled ?
 
-    //   <OverlayTrigger
-    // placement="right"
-    // delay={{ show: 250, hide: 400 }}
-    // overlay={renderTooltip}
-    //   >
-    //   <Button variant="success">Hover me to see</Button>
-    //   </OverlayTrigger>
+     <OverlayTrigger overlay={renderTooltip()}
+                     placement="right">
+       <div className="d-inline-block SearchHereButton-tooltip-overlay"
+            style={isDisabled ? { cursor: "not-allowed" } : {}}>
+         {renderButton()}
+       </div>
+     </OverlayTrigger>
+     : renderButton()
 
-    //   <Button variant="secondary"
-    //           onClick={renderMapItems}
-    // className="SearchHereButton"
-    // disabled={map.current.getZoom() <= 14}>
-    //     Search Here
-    //   </Button>
   );
 }
 
