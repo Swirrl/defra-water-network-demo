@@ -72,7 +72,7 @@ export const setupEmptyOverlays = (map) => {
     type: "circle",
     source: "waterQualitySites",
     paint: {
-      "circle-color": "#379102",
+      "circle-color": "#31ede6",
       "circle-radius": 8
     }
   });
