@@ -13,7 +13,13 @@ export const getURL = async (url) => {
 };
 
 const getNextPageLink = (response) => {
-  return response.links.find((link) => link.rel === "next");
+  const nextLink = response.links.find((link) => link.rel === "next");
+
+  // Workaround, since the current API's domain is: defra-water-network-prod.publishmydata.com
+  // but the API returns next links with the domain we'll eventually use: environment.data.gov.uk
+  if (nextLink) {
+    return [waterNetworkAPIBase, ...nextLink.href.split('/').slice(6)].join('/')
+  }
 };
 
 const mergeFeatures = (response, nextPageResponse) => {
@@ -29,7 +35,7 @@ const getBBoxPages = async (response) => {
   let nextPageLink = getNextPageLink(response);
 
   if (nextPageLink) {
-    const nextPageResponse = await getURL(nextPageLink.href);
+    const nextPageResponse = await getURL(nextPageLink);
     const nextResponse = mergeFeatures(response, nextPageResponse);
     return getBBoxPages(nextResponse);
   } else {
