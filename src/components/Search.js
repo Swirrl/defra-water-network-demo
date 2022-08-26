@@ -20,8 +20,10 @@ function Search({map}) {
 
   const onSubmit = async (event) => {
     event.preventDefault();
-    const places = await getOSNames(query);
-    setResults(places.results);
+    if (query) {
+      const places = await getOSNames(query);
+      setResults(places.results); 
+    }
   };
 
   const selectEntry = async (entry) => {
@@ -83,7 +85,7 @@ function Search({map}) {
                             placeholder="Search for a place"
                             onChange={(e) => setQuery(e.target.value)}/>
             </Form.Group>
-            <Button variant="primary" type="submit">Submit</Button>
+            <Button variant="primary" type="submit" disabled={(query ? false : true)}>Submit</Button>
             {resultsList()}
           </Form>
 
