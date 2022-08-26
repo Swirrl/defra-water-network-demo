@@ -11,17 +11,24 @@ const toTableCells = (displayProps) =>{
     return(
     `<tr>
        <th style="vertical-align: top">${key}</th>
-       <td>${displayProps[key]}</td>
+       <td>${value}</td>
      </tr>`);
   }).join("");
 };
 
-const popupTableHTML = (title, displayProps) => {
+const popupTableHTML = (title, displayProps, url) => {
+  let link = "";
+  
+  if (url) {
+    link = `<tr><a target="_blank" href=${url}>Site API endpoint</a></tr>`
+  }
+
   return (
     `<table>
        <caption style="font-weight: bold; caption-side: top">${title}</caption>
         ${toTableCells(displayProps)}
-     </table>`);
+     </table>
+     ${link}`);
 };
 
 const hydroNodePropertiesToHTML = ({properties}) => {
@@ -56,9 +63,22 @@ const watercourseLinkPropertiesToHTML = ({properties}) => {
   return popupTableHTML("Watercourse Link", displayProps);
 };
 
-const sitePropertiesToHTML = ({properties}) => {
+const sitePropertiesToHTML = ({properties, source}) => {
+  let url;
+  let ecologyEndpoint = "https://environment.data.gov.uk/ecology/api/v1/sites/"
+  
+  if (source === "biosysSites") {
+    const siteId = getLastURLSegment(properties.uri)
+    url = `${ecologyEndpoint}http%3A%2F%2Fenvironment.data.gov.uk%2Fecology%2Fsite%2Fbio%2F${siteId}`
+  } else if (source === "freshwaterSites") {
+    const siteId = getLastURLSegment(properties.uri)
+    url = `${ecologyEndpoint}http%3A%2F%2Fenvironment.data.gov.uk%2Fecology%2Fsite%2Ffish%2F${siteId}`
+  } else {
+    url = properties.uri
+  }
+
   return popupTableHTML("Monitoring Site", {"Name": properties.label,
-                                            "URI": properties.uri});
+                                            "URI": properties.uri}, url);
 };
 
 const getCoords = (event) => {
