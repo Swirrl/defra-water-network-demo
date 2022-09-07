@@ -9,6 +9,8 @@ import './Map.css';
 
 import { setupEmptyOverlays } from "../utils/map";
 import { setupLayerPopups } from "../utils/popups";
+import { useParams } from 'react-router-dom';
+import { showWatercourseLink } from '../utils/wc-link-from-id';
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 
@@ -18,9 +20,12 @@ function Map() {
   const [lng, setLng] = useState(-2.25);
   const [lat, setLat] = useState(53.48);
   const [zoom, setZoom] = useState(9);
+  const [showSearch, setShowSearch] =  useState(true)
 
   const OSapiKey = process.env.REACT_APP_OS_API_KEY;
   const OSserviceUrl = 'https://api.os.uk/maps/raster/v1/zxy';
+  
+  const watercourseLinkId = useParams().watercourseLinkId
 
   const setLngLat = ([lng, lat]) => {
     setLng(lng.toFixed(4));
@@ -79,9 +84,18 @@ function Map() {
     });
   });
 
+  useEffect(() => {
+    if (!map.current) return; // wait for map to initialize
+
+    if (watercourseLinkId) {
+      showWatercourseLink(watercourseLinkId, map)
+      setShowSearch(false)
+    }
+  }, [watercourseLinkId]);
+
   return (
     <>
-      <Search map={map} />
+      <Search map={map} initialShow={showSearch} />
       <SearchHereButton map={map} />
       <LayerToggles map={map} />
       <div ref={mapContainer} className="Map-container" />

@@ -67,3 +67,13 @@ export const displayWaterNetworkFeaturesInMapViewport = async (map) => {
       map.getSource("watercourseLinks").setData(watercourseLinks);
     });
 };
+
+export const getWatercourseLink = async (id) => {
+  const url = waterNetworkAPIBase + "/collections/" + "WatercourseLink" + "/items/" + id;
+  return await getURL(url);
+}
+
+export const getHydroNode = async (id) => {
+  const url = waterNetworkAPIBase + "/collections/" + "HydroNode" + "/items/" + id;
+  return await getURL(url);
+}

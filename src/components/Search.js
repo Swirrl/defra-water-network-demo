@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import Tab from 'react-bootstrap/Tab'
+import Tabs from 'react-bootstrap/Tabs'
 
 import { displayWaterNetworkFeaturesInMapViewport } from "../utils/water-network-data";
 import { displayMonitoringSitesFeaturesInMapViewport } from "../utils/monitoring-sites-data";
@@ -9,8 +11,9 @@ import { getOSNames } from "../utils/os-names";
 import { OSGridToLatLng } from "../utils/coords";
 
 import './Search.css';
+import { useNavigate } from 'react-router-dom';
 
-function Search({map}) {
+function Search({map, initialShow}) {
   const [results, setResults] = useState([]);
   const [query, setQuery] = useState("");
 
@@ -18,11 +21,25 @@ function Search({map}) {
   const handleClose = () => {setShow(false);};
   const handleShow = () => {setShow(true);};
 
-  const onSubmit = async (event) => {
+  const navigate = useNavigate()
+
+  const onSubmitPlace = async (event) => {
     event.preventDefault();
     if (query) {
       const places = await getOSNames(query);
       setResults(places.results); 
+    }
+  };
+
+  useEffect(() => {
+    setShow(initialShow)
+  }, [initialShow])
+
+  const onSubmitWL = async (event) => {
+    event.preventDefault();
+    if (query) {
+      navigate('/watercourse-link/' + query)
+      setShow(false)
     }
   };
 
@@ -77,18 +94,32 @@ function Search({map}) {
           <Offcanvas.Title>Water Network API</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-
-          <Form onSubmit={onSubmit}>
-            <Form.Group controlId="search-query" className="mb-3">
-              <Form.Label visuallyHidden="true">Search for a place</Form.Label>
-              <Form.Control type="text"
-                            placeholder="Search for a place"
-                            onChange={(e) => setQuery(e.target.value)}/>
-            </Form.Group>
-            <Button variant="primary" type="submit" disabled={(query ? false : true)}>Submit</Button>
-            {resultsList()}
-          </Form>
-
+          <Tabs defaultActiveKey="place" className='Search-tabs'>
+            <Tab eventKey="place" title="Place">
+              <Form onSubmit={onSubmitPlace}>
+                <Form.Group controlId="search-query" className="mb-3">
+                  <Form.Label visuallyHidden="true">Search for a place</Form.Label>
+                  <Form.Control type="text"
+                                placeholder="Search for a place"
+                                onChange={(e) => setQuery(e.target.value)}/>
+                </Form.Group>
+                <Button variant="primary" type="submit" disabled={(query ? false : true)}>Submit</Button>
+                {resultsList()}
+              </Form>
+            </Tab>
+            <Tab eventKey="watercourse-link" title="Watercourse Link">
+            <Form onSubmit={onSubmitWL}>
+                <Form.Group controlId="wcl-query" className="mb-3">
+                  <Form.Label visuallyHidden="true">Search for a Watercourse Link</Form.Label>
+                  <Form.Control type="text"
+                                placeholder="Search for a Watercourse Link"
+                                onChange={(e) => setQuery(e.target.value)}/>
+                </Form.Group>
+                <Button variant="primary" type="submit" disabled={(query ? false : true)}>Submit</Button>
+                {resultsList()}
+              </Form>
+            </Tab>
+          </Tabs>
         </Offcanvas.Body>
       </Offcanvas>
     </>
