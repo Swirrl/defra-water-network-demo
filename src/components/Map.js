@@ -93,10 +93,12 @@ function Map() {
   useEffect(() => {
     if (!map.current) return; // wait for map to initialize
 
-    if (watercourseLinkId) {
-      showWatercourseLink(watercourseLinkId, map);
-      setShowSearch(false);
-    }
+    map.current.once("idle", () => {
+      if (watercourseLinkId) {
+        showWatercourseLink(watercourseLinkId, map);
+        setShowSearch(false);
+      }
+    });
   }, [watercourseLinkId]);
 
   return (
