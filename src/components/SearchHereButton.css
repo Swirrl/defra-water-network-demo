@@ -1,4 +1,5 @@
-.SearchHereButton-tooltip-overlay, .SearchHereButton {
+.SearchHereButton-tooltip-overlay,
+.SearchHereButton {
   position: absolute;
   z-index: 1;
   top: 4rem;

@@ -1,60 +1,63 @@
-import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
+import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 
 import { highlighestNearestWatercourseLink } from "../utils/nearest-wc-link-to-site";
 
-const getLastURLSegment = (url) =>{
+const getLastURLSegment = (url) => {
   return url.split("/").pop();
 };
 
-const toTableCells = (displayProps) =>{
-  return Object.entries(displayProps).map(([key, value]) => {
-    return(
-    `<tr>
+const toTableCells = (displayProps) => {
+  return Object.entries(displayProps)
+    .map(([key, value]) => {
+      return `<tr>
        <th style="vertical-align: top">${key}</th>
        <td>${value}</td>
-     </tr>`);
-  }).join("");
+     </tr>`;
+    })
+    .join("");
 };
 
 const popupTableHTML = (title, displayProps, url) => {
   let link = "";
-  
+
   if (url) {
-    link = `<tr><a target="_blank" href=${url}>Site API endpoint</a></tr>`
+    link = `<tr><a target="_blank" href=${url}>Site API endpoint</a></tr>`;
   }
 
-  return (
-    `<table>
+  return `<table>
        <caption style="font-weight: bold; caption-side: top">${title}</caption>
         ${toTableCells(displayProps)}
      </table>
-     ${link}`);
+     ${link}`;
 };
 
-const hydroNodePropertiesToHTML = ({properties}) => {
+const hydroNodePropertiesToHTML = ({ properties }) => {
   const displayProps = {
-    "ID": properties.id,
-    "Category": getLastURLSegment(properties.hydroNodeCategory)};
+    ID: properties.id,
+    Category: getLastURLSegment(properties.hydroNodeCategory),
+  };
 
   return popupTableHTML("Hydro Node", displayProps);
 };
 
-const watercourseLinkPropertiesToHTML = ({properties}) => {
+const watercourseLinkPropertiesToHTML = ({ properties }) => {
   const displayProps = {
-    "ID": properties.id,
+    ID: properties.id,
   };
 
   if (properties.length) {
     displayProps["Length"] = properties.length;
-  };
+  }
 
   if (properties.flowDirection) {
-    displayProps["Flow direction"] = getLastURLSegment(properties.flowDirection);
-  };
+    displayProps["Flow direction"] = getLastURLSegment(
+      properties.flowDirection
+    );
+  }
 
   if (properties.catchmentName) {
     displayProps["Catchment name"] = properties.catchmentName;
-  };
+  }
 
   if (properties.catchmentId) {
     displayProps["Catchment ID"] = properties.catchmentId;
@@ -63,22 +66,25 @@ const watercourseLinkPropertiesToHTML = ({properties}) => {
   return popupTableHTML("Watercourse Link", displayProps);
 };
 
-const sitePropertiesToHTML = ({properties, source}) => {
+const sitePropertiesToHTML = ({ properties, source }) => {
   let url;
-  let ecologyEndpoint = "https://environment.data.gov.uk/ecology/api/v1/sites/"
-  
+  let ecologyEndpoint = "https://environment.data.gov.uk/ecology/api/v1/sites/";
+
   if (source === "biosysSites") {
-    const siteId = getLastURLSegment(properties.uri)
-    url = `${ecologyEndpoint}http%3A%2F%2Fenvironment.data.gov.uk%2Fecology%2Fsite%2Fbio%2F${siteId}`
+    const siteId = getLastURLSegment(properties.uri);
+    url = `${ecologyEndpoint}http%3A%2F%2Fenvironment.data.gov.uk%2Fecology%2Fsite%2Fbio%2F${siteId}`;
   } else if (source === "freshwaterSites") {
-    const siteId = getLastURLSegment(properties.uri)
-    url = `${ecologyEndpoint}http%3A%2F%2Fenvironment.data.gov.uk%2Fecology%2Fsite%2Ffish%2F${siteId}`
+    const siteId = getLastURLSegment(properties.uri);
+    url = `${ecologyEndpoint}http%3A%2F%2Fenvironment.data.gov.uk%2Fecology%2Fsite%2Ffish%2F${siteId}`;
   } else {
-    url = properties.uri
+    url = properties.uri;
   }
 
-  return popupTableHTML("Monitoring Site", {"Name": properties.label,
-                                            "URI": properties.uri}, url);
+  return popupTableHTML(
+    "Monitoring Site",
+    { Name: properties.label, URI: properties.uri },
+    url
+  );
 };
 
 const getCoords = (event) => {
@@ -86,10 +92,7 @@ const getCoords = (event) => {
 };
 
 const newPopup = (coords, text, map) => {
- return new mapboxgl.Popup()
-    .setLngLat(coords)
-    .setHTML(text)
-    .addTo(map);
+  return new mapboxgl.Popup().setLngLat(coords).setHTML(text).addTo(map);
 };
 
 export const setupLayerPopups = (map) => {
@@ -113,10 +116,12 @@ export const setupLayerPopups = (map) => {
     newPopup(coords, text, map);
   });
 
-  for (const layer of ["biosysSites",
-                       "waterQualitySites",
-                       "riverLevelSites",
-                       "freshwaterSites"]) {
+  for (const layer of [
+    "biosysSites",
+    "waterQualitySites",
+    "riverLevelSites",
+    "freshwaterSites",
+  ]) {
     map.on("click", layer, async (e) => {
       if (e.originalEvent.defaultPrevented) return;
       e.originalEvent.preventDefault();
@@ -129,13 +134,14 @@ export const setupLayerPopups = (map) => {
     });
   }
 
-  for (const layer of ["biosysSites",
-                       "waterQualitySites",
-                       "riverLevelSites",
-                       "freshwaterSites",
-                       "hydroNodes",
-                       "watercourseLinks"]) {
-
+  for (const layer of [
+    "biosysSites",
+    "waterQualitySites",
+    "riverLevelSites",
+    "freshwaterSites",
+    "hydroNodes",
+    "watercourseLinks",
+  ]) {
     // Change cursor to a pointer when the mouse is over the feature layers
     map.on("mouseenter", layer, () => {
       map.getCanvas().style.cursor = "pointer";

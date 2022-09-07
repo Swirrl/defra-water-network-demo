@@ -1,5 +1,5 @@
 export const getMapBoundingBox = (map) => {
-  const {_sw, _ne} = map.getBounds();
+  const { _sw, _ne } = map.getBounds();
   return [_sw.lng, _sw.lat, _ne.lng, _ne.lat];
 };
 
@@ -8,8 +8,8 @@ const addGeoJSONSource = (map, name) => {
     type: "geojson",
     data: {
       type: "FeatureCollection",
-      features: []
-    }
+      features: [],
+    },
   });
 };
 
@@ -21,12 +21,12 @@ export const setupEmptyOverlays = (map) => {
     source: "bbox",
     layout: {
       "line-join": "round",
-      "line-cap": "round"
+      "line-cap": "round",
     },
     paint: {
       "line-color": "#c13634",
-      "line-width": 2
-    }
+      "line-width": 2,
+    },
   });
 
   addGeoJSONSource(map, "watercourseLinks");
@@ -36,12 +36,12 @@ export const setupEmptyOverlays = (map) => {
     source: "watercourseLinks",
     layout: {
       "line-join": "round",
-      "line-cap": "round"
+      "line-cap": "round",
     },
     paint: {
       "line-color": "#0079c4",
-      "line-width": 4
-    }
+      "line-width": 4,
+    },
   });
 
   addGeoJSONSource(map, "highlightWatercourseLink");
@@ -51,12 +51,12 @@ export const setupEmptyOverlays = (map) => {
     source: "highlightWatercourseLink",
     layout: {
       "line-join": "round",
-      "line-cap": "round"
+      "line-cap": "round",
     },
     paint: {
       "line-color": "red",
-      "line-width": 8
-    }
+      "line-width": 8,
+    },
   });
 
   addGeoJSONSource(map, "hydroNodes");
@@ -66,8 +66,8 @@ export const setupEmptyOverlays = (map) => {
     source: "hydroNodes",
     paint: {
       "circle-color": "#004e7f",
-      "circle-radius": 5
-    }
+      "circle-radius": 5,
+    },
   });
 
   addGeoJSONSource(map, "biosysSites");
@@ -77,8 +77,8 @@ export const setupEmptyOverlays = (map) => {
     source: "biosysSites",
     paint: {
       "circle-color": "#379102",
-      "circle-radius": 8
-    }
+      "circle-radius": 8,
+    },
   });
 
   addGeoJSONSource(map, "waterQualitySites");
@@ -88,8 +88,8 @@ export const setupEmptyOverlays = (map) => {
     source: "waterQualitySites",
     paint: {
       "circle-color": "#31ede6",
-      "circle-radius": 8
-    }
+      "circle-radius": 8,
+    },
   });
 
   addGeoJSONSource(map, "riverLevelSites");
@@ -99,8 +99,8 @@ export const setupEmptyOverlays = (map) => {
     source: "riverLevelSites",
     paint: {
       "circle-color": "#d18700",
-      "circle-radius": 8
-    }
+      "circle-radius": 8,
+    },
   });
 
   addGeoJSONSource(map, "freshwaterSites");
@@ -110,21 +110,23 @@ export const setupEmptyOverlays = (map) => {
     source: "freshwaterSites",
     paint: {
       "circle-color": "#720e93",
-      "circle-radius": 8
-    }
+      "circle-radius": 8,
+    },
   });
 };
 
 export const bboxPolygon = ([swLng, swLat, neLng, neLat]) => {
   return {
-    "type": "Feature",
-    "geometry": {
-      "type": "LineString",
-      "coordinates": [[swLng, swLat],
-                      [swLng, neLat],
-                      [neLng, neLat],
-                      [neLng, swLat],
-                      [swLng, swLat]]
-    }
+    type: "Feature",
+    geometry: {
+      type: "LineString",
+      coordinates: [
+        [swLng, swLat],
+        [swLng, neLat],
+        [neLng, neLat],
+        [neLng, swLat],
+        [swLng, swLat],
+      ],
+    },
   };
 };

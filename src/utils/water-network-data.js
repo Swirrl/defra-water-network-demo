@@ -5,11 +5,12 @@ export const waterNetworkAPIKey = process.env.REACT_APP_WATER_NETWORK_API_KEY;
 
 export const getURL = async (url) => {
   const headers = {
-    "Authorization": `Basic ${waterNetworkAPIKey}`
+    Authorization: `Basic ${waterNetworkAPIKey}`,
   };
 
-  return await fetch(url, {method: "GET", headers: headers
-                          }).then(response => response.json());
+  return await fetch(url, { method: "GET", headers: headers }).then(
+    (response) => response.json()
+  );
 };
 
 const getNextPageLink = (response) => {
@@ -18,7 +19,9 @@ const getNextPageLink = (response) => {
   // Workaround, since the current API's domain is: defra-water-network-prod.publishmydata.com
   // but the API returns next links with the domain we'll eventually use: environment.data.gov.uk
   if (nextLink) {
-    return [waterNetworkAPIBase, ...nextLink.href.split('/').slice(6)].join('/')
+    return [waterNetworkAPIBase, ...nextLink.href.split("/").slice(6)].join(
+      "/"
+    );
   }
 };
 
@@ -27,7 +30,7 @@ const mergeFeatures = (response, nextPageResponse) => {
   return {
     ...nextPageResponse,
     features: allFeatures,
-    numberReturned: response.numberReturned + nextPageResponse.numberReturned
+    numberReturned: response.numberReturned + nextPageResponse.numberReturned,
   };
 };
 
@@ -44,9 +47,13 @@ const getBBoxPages = async (response) => {
 };
 
 const getFeaturesInBoundingBox = async (collection, mapBounds) => {
-  const url = waterNetworkAPIBase +
-        "/collections/" + collection + "/items" +
-        "?bbox=" + mapBounds.join(",");
+  const url =
+    waterNetworkAPIBase +
+    "/collections/" +
+    collection +
+    "/items" +
+    "?bbox=" +
+    mapBounds.join(",");
 
   let response = await getURL(url);
   return getBBoxPages(response);
@@ -57,23 +64,25 @@ export const displayWaterNetworkFeaturesInMapViewport = async (map) => {
   const box = bboxPolygon(mapBounds);
   map.getSource("bbox").setData(box);
 
-  await getFeaturesInBoundingBox("HydroNode", mapBounds)
-    .then((hydroNodes) => {
-      map.getSource("hydroNodes").setData(hydroNodes);
-    });
+  await getFeaturesInBoundingBox("HydroNode", mapBounds).then((hydroNodes) => {
+    map.getSource("hydroNodes").setData(hydroNodes);
+  });
 
-  await getFeaturesInBoundingBox("WatercourseLink", mapBounds)
-    .then((watercourseLinks) => {
+  await getFeaturesInBoundingBox("WatercourseLink", mapBounds).then(
+    (watercourseLinks) => {
       map.getSource("watercourseLinks").setData(watercourseLinks);
-    });
+    }
+  );
 };
 
 export const getWatercourseLink = async (id) => {
-  const url = waterNetworkAPIBase + "/collections/" + "WatercourseLink" + "/items/" + id;
+  const url =
+    waterNetworkAPIBase + "/collections/" + "WatercourseLink" + "/items/" + id;
   return await getURL(url);
-}
+};
 
 export const getHydroNode = async (id) => {
-  const url = waterNetworkAPIBase + "/collections/" + "HydroNode" + "/items/" + id;
+  const url =
+    waterNetworkAPIBase + "/collections/" + "HydroNode" + "/items/" + id;
   return await getURL(url);
-}
+};

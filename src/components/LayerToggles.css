@@ -43,12 +43,12 @@
   border-color: #720e93;
 }
 
-#hydroNodes:checked{
+#hydroNodes:checked {
   background-color: #004e7f;
   border-color: #004e7f;
 }
 
-#watercouseLinks:checked{
+#watercouseLinks:checked {
   background-color: #0079c4;
   border-color: #0079c4;
 }

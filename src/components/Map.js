@@ -1,16 +1,16 @@
-import React, { useRef, useEffect, useState } from 'react';
-import mapboxgl from '!mapbox-gl'; // eslint-disable-line import/no-webpack-loader-syntax
+import React, { useRef, useEffect, useState } from "react";
+import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 
-import Search from "./Search"
-import SearchHereButton from "./SearchHereButton"
-import LayerToggles from "./LayerToggles"
+import Search from "./Search";
+import SearchHereButton from "./SearchHereButton";
+import LayerToggles from "./LayerToggles";
 
-import './Map.css';
+import "./Map.css";
 
 import { setupEmptyOverlays } from "../utils/map";
 import { setupLayerPopups } from "../utils/popups";
-import { useParams } from 'react-router-dom';
-import { showWatercourseLink } from '../utils/wc-link-from-id';
+import { useParams } from "react-router-dom";
+import { showWatercourseLink } from "../utils/wc-link-from-id";
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 
@@ -20,12 +20,12 @@ function Map() {
   const [lng, setLng] = useState(-2.25);
   const [lat, setLat] = useState(53.48);
   const [zoom, setZoom] = useState(9);
-  const [showSearch, setShowSearch] =  useState(true)
+  const [showSearch, setShowSearch] = useState(true);
 
   const OSapiKey = process.env.REACT_APP_OS_API_KEY;
-  const OSserviceUrl = 'https://api.os.uk/maps/raster/v1/zxy';
-  
-  const watercourseLinkId = useParams().watercourseLinkId
+  const OSserviceUrl = "https://api.os.uk/maps/raster/v1/zxy";
+
+  const watercourseLinkId = useParams().watercourseLinkId;
 
   const setLngLat = ([lng, lat]) => {
     setLng(lng.toFixed(4));
@@ -39,25 +39,29 @@ function Map() {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: {
-        "version": 8,
-        "sources": {
+        version: 8,
+        sources: {
           "raster-tiles": {
-            "type": "raster",
-            "tiles": [ OSserviceUrl + "/Light_3857/{z}/{x}/{y}.png?key=" + OSapiKey ],
-            "tileSize": 256,
-            "maxzoom": 17
-          }
+            type: "raster",
+            tiles: [
+              OSserviceUrl + "/Light_3857/{z}/{x}/{y}.png?key=" + OSapiKey,
+            ],
+            tileSize: 256,
+            maxzoom: 17,
+          },
         },
-        "layers": [{
-          "id": "os-maps-zxy",
-          "type": "raster",
-          "source": "raster-tiles",
-        }],
-        "sprite": "mapbox://sprites/mapbox/bright-v9",
+        layers: [
+          {
+            id: "os-maps-zxy",
+            type: "raster",
+            source: "raster-tiles",
+          },
+        ],
+        sprite: "mapbox://sprites/mapbox/bright-v9",
       },
       maxBounds: [
         [-6.354204, 49.894995],
-        [2.066974, 55.765636]
+        [2.066974, 55.765636],
       ],
       center: [lng, lat],
       zoom: zoom,
@@ -66,9 +70,11 @@ function Map() {
     map.current.on("load", () => {
       map.current.dragRotate.disable();
       map.current.touchZoomRotate.disableRotation();
-      map.current.addControl(new mapboxgl.NavigationControl({
-        showCompass: false
-      }));
+      map.current.addControl(
+        new mapboxgl.NavigationControl({
+          showCompass: false,
+        })
+      );
 
       setupEmptyOverlays(map.current);
       setupLayerPopups(map.current);
@@ -79,7 +85,7 @@ function Map() {
     if (!map.current) return; // wait for map to initialize
 
     map.current.on("move", () => {
-      setLngLat([map.current.getCenter().lng, map.current.getCenter().lat])
+      setLngLat([map.current.getCenter().lng, map.current.getCenter().lat]);
       setZoom(map.current.getZoom().toFixed(2));
     });
   });
@@ -88,8 +94,8 @@ function Map() {
     if (!map.current) return; // wait for map to initialize
 
     if (watercourseLinkId) {
-      showWatercourseLink(watercourseLinkId, map)
-      setShowSearch(false)
+      showWatercourseLink(watercourseLinkId, map);
+      setShowSearch(false);
     }
   }, [watercourseLinkId]);
 

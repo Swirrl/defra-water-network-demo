@@ -1,6 +1,6 @@
-import 'bootstrap/dist/css/bootstrap.min.css';
-import './App.css';
-import { Route, Routes } from 'react-router-dom';
+import "bootstrap/dist/css/bootstrap.min.css";
+import "./App.css";
+import { Route, Routes } from "react-router-dom";
 import Map from "./components/Map";
 
 function App() {
@@ -8,7 +8,10 @@ function App() {
     <div>
       <div>
         <Routes>
-          <Route path="/watercourse-link/:watercourseLinkId" element={<Map />}/> 
+          <Route
+            path="/watercourse-link/:watercourseLinkId"
+            element={<Map />}
+          />
           <Route path="*" element={<Map />} />
         </Routes>
       </div>

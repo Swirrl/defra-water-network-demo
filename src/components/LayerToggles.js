@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import Card from 'react-bootstrap/Card';
-import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
+import Card from "react-bootstrap/Card";
+import Form from "react-bootstrap/Form";
+import Button from "react-bootstrap/Button";
 
-import './LayerToggles.css';
+import "./LayerToggles.css";
 
-function LayerToggles ({map}) {
+function LayerToggles({ map }) {
   const [biosysChecked, setBiosysChecked] = useState(true);
   const [waterQualityChecked, setWaterQualityChecked] = useState(true);
   const [riverLevelChecked, setRiverLevelChecked] = useState(true);
@@ -19,17 +19,17 @@ function LayerToggles ({map}) {
 
   const toggleExpanded = () => {
     setExpanded(!isExpanded);
-    const symbol = isExpanded ?  "▶" : "◀" ;
+    const symbol = isExpanded ? "▶" : "◀";
     setButtonSymbol(symbol);
   };
 
   const layersToSetters = {
-    "biosysSites": setBiosysChecked,
-    "waterQualitySites": setWaterQualityChecked,
-    "riverLevelSites": setRiverLevelChecked,
-    "freshwaterSites": setFreshwaterChecked,
-    "hydroNodes": setHydroNodes,
-    "watercourseLinks": setWatercourseLinks
+    biosysSites: setBiosysChecked,
+    waterQualitySites: setWaterQualityChecked,
+    riverLevelSites: setRiverLevelChecked,
+    freshwaterSites: setFreshwaterChecked,
+    hydroNodes: setHydroNodes,
+    watercourseLinks: setWatercourseLinks,
   };
 
   const toggleLayer = (e) => {
@@ -44,38 +44,57 @@ function LayerToggles ({map}) {
 
   return (
     <Card className="LayerToggles">
-      <Card.Body className={isExpanded ? "LayerToggles-expanded" : "LayerToggles-collapsed"}>
+      <Card.Body
+        className={
+          isExpanded ? "LayerToggles-expanded" : "LayerToggles-collapsed"
+        }
+      >
         <Form>
-          <Form.Switch label="Hydro Nodes"
-                       id="hydroNodes"
-                       onChange={toggleLayer}
-                       checked={hydroNodesChecked} />
-          <Form.Switch label="Watercourse Links"
-                       id="watercourseLinks"
-                       onChange={toggleLayer}
-                       checked={watercourseLinksChecked} />
-          <Form.Switch label="Biosys Sites"
-                       id="biosysSites"
-                       onChange={toggleLayer}
-                       checked={biosysChecked} />
-          <Form.Switch label="Water Quality Sites"
-                       id="waterQualitySites"
-                       onChange={toggleLayer}
-                       checked={waterQualityChecked} />
-          <Form.Switch label="River Level Sites"
-                       id="riverLevelSites"
-                       onChange={toggleLayer}
-                       checked={riverLevelChecked} />
-          <Form.Switch label="Fish Population Freshwater Sites"
-                       id="freshwaterSites"
-                       onChange={toggleLayer}
-                       checked={freshwaterChecked} />
+          <Form.Switch
+            label="Hydro Nodes"
+            id="hydroNodes"
+            onChange={toggleLayer}
+            checked={hydroNodesChecked}
+          />
+          <Form.Switch
+            label="Watercourse Links"
+            id="watercourseLinks"
+            onChange={toggleLayer}
+            checked={watercourseLinksChecked}
+          />
+          <Form.Switch
+            label="Biosys Sites"
+            id="biosysSites"
+            onChange={toggleLayer}
+            checked={biosysChecked}
+          />
+          <Form.Switch
+            label="Water Quality Sites"
+            id="waterQualitySites"
+            onChange={toggleLayer}
+            checked={waterQualityChecked}
+          />
+          <Form.Switch
+            label="River Level Sites"
+            id="riverLevelSites"
+            onChange={toggleLayer}
+            checked={riverLevelChecked}
+          />
+          <Form.Switch
+            label="Fish Population Freshwater Sites"
+            id="freshwaterSites"
+            onChange={toggleLayer}
+            checked={freshwaterChecked}
+          />
         </Form>
-        <Button variant="secondary"
-                size="sm"
-                onClick={toggleExpanded}
-                className="LayerToggles-collapse-button">{buttonSymbol}</Button>
-
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={toggleExpanded}
+          className="LayerToggles-collapse-button"
+        >
+          {buttonSymbol}
+        </Button>
       </Card.Body>
     </Card>
   );

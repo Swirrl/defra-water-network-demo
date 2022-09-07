@@ -6,20 +6,25 @@ const toFeature = (row) => {
     type: "Feature",
     geometry: {
       type: "Point",
-      coordinates: OSGridToLatLng([parseInt(easting), parseInt(northing)])
+      coordinates: OSGridToLatLng([parseInt(easting), parseInt(northing)]),
     },
     properties: {
       uri: s,
-      label: label
-    }
+      label: label,
+    },
   };
 };
 
-const toFeatures = (csv) => csv.split("\r\n").slice(1).filter(row => row.length > 0).map(toFeature);
+const toFeatures = (csv) =>
+  csv
+    .split("\r\n")
+    .slice(1)
+    .filter((row) => row.length > 0)
+    .map(toFeature);
 
 export const csvToGeoJSON = (csv) => {
   return {
     type: "FeatureCollection",
-    features: toFeatures(csv)
+    features: toFeatures(csv),
   };
 };
