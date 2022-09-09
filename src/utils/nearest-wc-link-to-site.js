@@ -10,8 +10,15 @@ const getNearestWCLinkToPoint = async (coords) => {
   return await getURL(url);
 };
 
-export const highlighestNearestWatercourseLink = async (coords, map) => {
+export const highlightNearestWatercourseLink = async (coords, map) => {
   await getNearestWCLinkToPoint(coords).then((watercourseLink) => {
     map.getSource("highlightWatercourseLink").setData(watercourseLink);
+  });
+};
+
+export const unhighlightWatercourseLink = (map) => {
+  map.getSource("highlightWatercourseLink").setData({
+    type: "FeatureCollection",
+    features: [],
   });
 };

@@ -8,9 +8,15 @@ import { displayMonitoringSitesFeaturesInMapViewport } from "../utils/monitoring
 import { debounce } from "../utils/misc";
 
 import "./SearchHereButton.css";
+import { useNavigate } from "react-router-dom";
+import { unhighlightWatercourseLink } from "../utils/nearest-wc-link-to-site";
 
 function SearchHereButton({ map }) {
+  const navigate = useNavigate();
+
   const renderMapItems = async () => {
+    navigate("/");
+    unhighlightWatercourseLink(map.current);
     await displayWaterNetworkFeaturesInMapViewport(map.current);
     await displayMonitoringSitesFeaturesInMapViewport(map.current);
   };

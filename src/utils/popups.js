@@ -1,6 +1,6 @@
 import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 
-import { highlighestNearestWatercourseLink } from "../utils/nearest-wc-link-to-site";
+import { highlightNearestWatercourseLink } from "../utils/nearest-wc-link-to-site";
 
 const getLastURLSegment = (url) => {
   return url.split("/").pop();
@@ -130,7 +130,7 @@ export const setupLayerPopups = (map) => {
       const text = sitePropertiesToHTML(e.features[0]);
 
       newPopup(coords, text, map);
-      await highlighestNearestWatercourseLink(coords, map);
+      await highlightNearestWatercourseLink(coords, map);
     });
   }
 
