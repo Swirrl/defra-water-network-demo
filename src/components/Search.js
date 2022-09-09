@@ -13,11 +13,12 @@ import { OSGridToLatLng } from "../utils/coords";
 import "./Search.css";
 import { useNavigate } from "react-router-dom";
 import { unhighlightWatercourseLink } from "../utils/nearest-wc-link-to-site";
+import { showWatercourseLink } from "../utils/wc-link-from-id";
 
 function Search({ map, initialShow }) {
   const [results, setResults] = useState([]);
   const [query, setQuery] = useState("");
-
+  const [error, setError] = useState(null);
   const [show, setShow] = useState(true);
   const handleClose = () => {
     setShow(false);
@@ -43,8 +44,13 @@ function Search({ map, initialShow }) {
   const onSubmitWL = async (event) => {
     event.preventDefault();
     if (query) {
-      navigate("/watercourse-link/" + query);
-      setShow(false);
+      showWatercourseLink(query, map)
+        .then(() => {
+          setError(null);
+          setShow(false);
+          navigate("/watercourse-link/" + query);
+        })
+        .catch((error) => setError(error));
     }
   };
 
@@ -137,7 +143,11 @@ function Search({ map, initialShow }) {
                     type="text"
                     placeholder="Search for a Watercourse Link"
                     onChange={(e) => setQuery(e.target.value)}
+                    isInvalid={error}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    No results found for given ID.
+                  </Form.Control.Feedback>
                 </Form.Group>
                 <Button
                   variant="primary"
