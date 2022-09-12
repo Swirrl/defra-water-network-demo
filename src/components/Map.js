@@ -21,6 +21,7 @@ function Map() {
   const [lat, setLat] = useState(53.48);
   const [zoom, setZoom] = useState(9);
   const [showSearch, setShowSearch] = useState(true);
+  const [searchError, setSearchError] = useState(null);
 
   const OSapiKey = process.env.REACT_APP_OS_API_KEY;
   const OSserviceUrl = "https://api.os.uk/maps/raster/v1/zxy";
@@ -95,15 +96,21 @@ function Map() {
 
     map.current.once("idle", () => {
       if (watercourseLinkId) {
-        showWatercourseLink(watercourseLinkId, map);
-        setShowSearch(false);
+        showWatercourseLink(watercourseLinkId, map)
+          .then(() => {
+            setShowSearch(false);
+          })
+          .catch((error) => {
+            setSearchError(error);
+            setShowSearch(true);
+          });
       }
     });
   }, [watercourseLinkId]);
 
   return (
     <>
-      <Search map={map} initialShow={showSearch} />
+      <Search map={map} initialShow={showSearch} initialError={searchError} />
       <SearchHereButton map={map} />
       <LayerToggles map={map} />
       <div ref={mapContainer} className="Map-container" />

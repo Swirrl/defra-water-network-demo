@@ -15,11 +15,12 @@ import { useNavigate } from "react-router-dom";
 import { unhighlightWatercourseLink } from "../utils/nearest-wc-link-to-site";
 import { showWatercourseLink } from "../utils/wc-link-from-id";
 
-function Search({ map, initialShow }) {
+function Search({ map, initialShow, initialError }) {
   const [results, setResults] = useState([]);
   const [query, setQuery] = useState("");
   const [error, setError] = useState(null);
   const [show, setShow] = useState(true);
+  const [key, setKey] = useState("place");
   const handleClose = () => {
     setShow(false);
   };
@@ -40,6 +41,13 @@ function Search({ map, initialShow }) {
   useEffect(() => {
     setShow(initialShow);
   }, [initialShow]);
+
+  useEffect(() => {
+    if (initialError) {
+      setError(initialError);
+      setKey("watercourse-link");
+    }
+  }, [initialError]);
 
   const onSubmitWL = async (event) => {
     event.preventDefault();
@@ -110,7 +118,11 @@ function Search({ map, initialShow }) {
           <Offcanvas.Title>Water Network API</Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
-          <Tabs defaultActiveKey="place" className="Search-tabs">
+          <Tabs
+            activeKey={key}
+            onSelect={(k) => setKey(k)}
+            className="Search-tabs"
+          >
             <Tab eventKey="place" title="Place">
               <Form onSubmit={onSubmitPlace}>
                 <Form.Group controlId="search-query" className="mb-3">
