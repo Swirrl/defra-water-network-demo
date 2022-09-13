@@ -18,18 +18,40 @@ const toTableCells = (displayProps) => {
     .join("");
 };
 
-const popupTableHTML = (title, displayProps, url) => {
-  let link = "";
-
-  if (url) {
-    link = `<tr><a target="_blank" href=${url}>Site API endpoint</a></tr>`;
-  }
-
+const basicPopupTableHTML = (title, displayProps) => {
   return `<table>
        <caption style="font-weight: bold; caption-side: top">${title}</caption>
         ${toTableCells(displayProps)}
-     </table>
-     ${link}`;
+     </table>`;
+};
+
+const closePopup = () => {
+  const popups = document.getElementsByClassName("mapboxgl-popup");
+  for (const popup of popups) {
+    popup.remove();
+  }
+};
+
+window.WCLinkSelectMode = false;
+const setWCLinkSelectMode = (val) => {
+  window.WCLinkSelectMode = val;
+};
+
+const associateWatercourseLink = () => {
+  closePopup();
+  setWCLinkSelectMode(true);
+  // next watercourselink click gets associated
+};
+
+const sitePopupHTML = (title, displayProps, url) => {
+  const rawAPILink = `<a target="_blank" href=${url}>Site API endpoint</a>`;
+  const associateWCLink = `<button class="btn btn-outline-secondary btn-sm mt-2"
+                                   id="associate-wc-link-button"
+                           >Associate watercourse link</button>`;
+
+  return `${basicPopupTableHTML(title, displayProps)}
+          ${rawAPILink}
+          ${associateWCLink}`;
 };
 
 const hydroNodePropertiesToHTML = ({ properties }) => {
@@ -38,7 +60,7 @@ const hydroNodePropertiesToHTML = ({ properties }) => {
     Category: getLastURLSegment(properties.hydroNodeCategory),
   };
 
-  return popupTableHTML("Hydro Node", displayProps);
+  return basicPopupTableHTML("Hydro Node", displayProps);
 };
 
 const watercourseLinkPropertiesToHTML = ({ properties }) => {
@@ -64,7 +86,7 @@ const watercourseLinkPropertiesToHTML = ({ properties }) => {
     displayProps["Catchment ID"] = properties.catchmentId;
   }
 
-  return popupTableHTML("Watercourse Link", displayProps);
+  return basicPopupTableHTML("Watercourse Link", displayProps);
 };
 
 const sitePropertiesToHTML = ({ properties, source }) => {
@@ -81,6 +103,11 @@ const sitePropertiesToHTML = ({ properties, source }) => {
     url = properties.uri;
   }
 
+  return sitePopupHTML(
+    "Monitoring Site",
+    { Name: properties.label, URI: properties.uri },
+    url
+  );
   const displayProps = { Name: properties.label, URI: properties.uri };
 
   if (properties.flow) {
@@ -95,7 +122,10 @@ const getCoords = (event) => {
 };
 
 const newPopup = (coords, text, map) => {
-  return new mapboxgl.Popup().setLngLat(coords).setHTML(text).addTo(map);
+  new mapboxgl.Popup().setLngLat(coords).setHTML(text).addTo(map);
+
+  const button = document.getElementById("associate-wc-link-button");
+  button?.addEventListener("click", associateWatercourseLink);
 };
 
 const getLatestCompleteReading = (readings) => {
