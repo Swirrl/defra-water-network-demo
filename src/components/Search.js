@@ -19,7 +19,7 @@ function Search({ map, initialShow, initialError }) {
   const [results, setResults] = useState([]);
   const [query, setQuery] = useState("");
   const [error, setError] = useState(null);
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
   const [key, setKey] = useState("place");
   const handleClose = () => {
     setShow(false);

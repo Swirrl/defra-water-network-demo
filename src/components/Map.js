@@ -20,7 +20,7 @@ function Map() {
   const [lng, setLng] = useState(-2.25);
   const [lat, setLat] = useState(53.48);
   const [zoom, setZoom] = useState(9);
-  const [showSearch, setShowSearch] = useState(true);
+  const [showSearch, setShowSearch] = useState(false);
   const [searchError, setSearchError] = useState(null);
 
   const OSapiKey = process.env.REACT_APP_OS_API_KEY;
@@ -96,17 +96,16 @@ function Map() {
 
     map.current.once("idle", () => {
       if (watercourseLinkId) {
-        showWatercourseLink(watercourseLinkId, map)
-          .then(() => {
-            setShowSearch(false);
-          })
-          .catch((error) => {
-            setSearchError(error);
-            setShowSearch(true);
-          });
+        setShowSearch(false);
+        showWatercourseLink(watercourseLinkId, map).catch((error) => {
+          setSearchError(error);
+          setShowSearch(true);
+        });
+      } else {
+        setShowSearch(true);
       }
     });
-  }, [watercourseLinkId]);
+  }, []);
 
   return (
     <>
