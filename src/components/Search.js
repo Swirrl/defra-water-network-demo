@@ -35,6 +35,7 @@ function Search({ map, initialShow, initialError }) {
     if (query) {
       const places = await getOSNames(query);
       setResults(places.results);
+      setError(false);
     }
   };
 
