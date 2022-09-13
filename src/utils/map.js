@@ -10,6 +10,7 @@ const addGeoJSONSource = (map, name) => {
       type: "FeatureCollection",
       features: [],
     },
+    generateId: true,
   });
 };
 
@@ -39,8 +40,18 @@ export const setupEmptyOverlays = (map) => {
       "line-cap": "round",
     },
     paint: {
-      "line-color": "#0079c4",
-      "line-width": 4,
+      "line-color": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        "orange",
+        "#0079c4",
+      ],
+      "line-width": [
+        "case",
+        ["boolean", ["feature-state", "hover"], false],
+        8,
+        4,
+      ],
     },
   });
 
