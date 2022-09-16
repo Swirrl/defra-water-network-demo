@@ -105,7 +105,7 @@ function Map() {
         setShowSearch(true);
       }
     });
-  }, []);
+  });
 
   return (
     <>
