@@ -38,6 +38,11 @@
   border-color: #d18700;
 }
 
+#riverFlowSites:checked {
+  background-color: #e200b5;
+  border-color: #e200b5;
+}
+
 #freshwaterSites:checked {
   background-color: #720e93;
   border-color: #720e93;
