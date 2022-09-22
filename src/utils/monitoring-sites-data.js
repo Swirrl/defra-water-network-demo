@@ -54,6 +54,13 @@ const riverLevelSitesQuery = ([sw, ne]) => {
   );
 };
 
+const riverFlowSitesQuery = ([
+  [swEasting, swNorthing],
+  [neEasting, neNorthing],
+]) => {
+  return `https://environment.data.gov.uk/hydrology/id/stations.csv?observedProperty=waterFlow&mineq-easting=${swEasting}&mineq-northing=${swNorthing}&maxeq-easting=${neEasting}&maxeq-northing=${neNorthing}&_projection=easting,northing,label`;
+};
+
 const fishPopulationFreshwaterSites = ([sw, ne]) => {
   return (
     `
@@ -96,6 +103,14 @@ const setSitesInBoundingBox = async (map, corners, layer) => {
   });
 };
 
+const setRiverFlowSitesInBoundingBox = async (map, corners, layer) => {
+  const query = riverFlowSitesQuery(corners);
+  const csv = await fetch(query).then((response) => response.text());
+
+  const sites = csvToGeoJSON(csv.replace(/"+/g, ""));
+  map.getSource(layer).setData(sites);
+};
+
 export const displayMonitoringSitesFeaturesInMapViewport = async (map) => {
   const mapBounds = getMapBoundingBox(map);
   const corners = mapBoundsToEastingNorthing(mapBounds);
@@ -104,4 +119,5 @@ export const displayMonitoringSitesFeaturesInMapViewport = async (map) => {
   await setSitesInBoundingBox(map, corners, "waterQualitySites");
   await setSitesInBoundingBox(map, corners, "riverLevelSites");
   await setSitesInBoundingBox(map, corners, "freshwaterSites");
+  await setRiverFlowSitesInBoundingBox(map, corners, "riverFlowSites");
 };

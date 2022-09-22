@@ -80,11 +80,13 @@ const sitePropertiesToHTML = ({ properties, source }) => {
     url = properties.uri;
   }
 
-  return popupTableHTML(
-    "Monitoring Site",
-    { Name: properties.label, URI: properties.uri },
-    url
-  );
+  const displayProps = { Name: properties.label, URI: properties.uri };
+
+  if (properties.flow) {
+    displayProps["Latest flow reading"] = properties.flow;
+  }
+
+  return popupTableHTML("Monitoring Site", displayProps, url);
 };
 
 const getCoords = (event) => {
@@ -93,6 +95,17 @@ const getCoords = (event) => {
 
 const newPopup = (coords, text, map) => {
   return new mapboxgl.Popup().setLngLat(coords).setHTML(text).addTo(map);
+};
+
+const getLatestFlowReadingInfo = async (url) => {
+  const measures = await fetch(`${url}/measures`).then((response) =>
+    response.json()
+  );
+  const readingUnit = measures.items[0].unitName;
+  const reading = await fetch(
+    `${measures.items[0]["@id"]}/readings?latest`
+  ).then((response) => response.json());
+  return `${reading.items[0].value} ${readingUnit} - ${reading.items[0].date}`;
 };
 
 export const setupLayerPopups = (map) => {
@@ -114,6 +127,20 @@ export const setupLayerPopups = (map) => {
     const text = watercourseLinkPropertiesToHTML(e.features[0]);
 
     newPopup(coords, text, map);
+  });
+
+  map.on("click", "riverFlowSites", async (e) => {
+    if (e.originalEvent.defaultPrevented) return;
+    e.originalEvent.preventDefault();
+    const coords = getCoords(e);
+    const feature = e.features[0];
+
+    const flow = await getLatestFlowReadingInfo(feature.properties.uri);
+    feature.properties.flow = flow;
+
+    const text = sitePropertiesToHTML(feature);
+    newPopup(coords, text, map);
+    await highlightNearestWatercourseLink(coords, map);
   });
 
   for (const layer of [
@@ -138,6 +165,7 @@ export const setupLayerPopups = (map) => {
     "biosysSites",
     "waterQualitySites",
     "riverLevelSites",
+    "riverFlowSites",
     "freshwaterSites",
     "hydroNodes",
     "watercourseLinks",

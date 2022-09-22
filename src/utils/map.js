@@ -103,6 +103,17 @@ export const setupEmptyOverlays = (map) => {
     },
   });
 
+  addGeoJSONSource(map, "riverFlowSites");
+  map.addLayer({
+    id: "riverFlowSites",
+    type: "circle",
+    source: "riverFlowSites",
+    paint: {
+      "circle-color": "#e200b5",
+      "circle-radius": 8,
+    },
+  });
+
   addGeoJSONSource(map, "freshwaterSites");
   map.addLayer({
     id: "freshwaterSites",
