@@ -111,8 +111,12 @@ function Search({ map, initialShow, initialError }) {
 
   return (
     <>
-      <Button variant="primary" onClick={handleShow} className="Search-button">
-        Search ▶
+      <Button
+        variant="primary"
+        onClick={handleShow}
+        className="Search-button govuk-button"
+      >
+        Search
       </Button>
       <Offcanvas show={show} onHide={handleClose}>
         <Offcanvas.Header closeButton>
@@ -140,6 +144,7 @@ function Search({ map, initialShow, initialError }) {
                   variant="primary"
                   type="submit"
                   disabled={query ? false : true}
+                  className="govuk-button"
                 >
                   Submit
                 </Button>
@@ -166,6 +171,7 @@ function Search({ map, initialShow, initialError }) {
                   variant="primary"
                   type="submit"
                   disabled={query ? false : true}
+                  className="govuk-button"
                 >
                   Submit
                 </Button>

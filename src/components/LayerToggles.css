@@ -52,3 +52,20 @@
   background-color: #0079c4;
   border-color: #0079c4;
 }
+
+.form-check-input:focus {
+  outline: 0;
+  box-shadow: 0 0 0 3px #fd0;
+}
+
+.LayerToggles-collapse-button {
+  background: black;
+  border-radius: 0;
+}
+.LayerToggles-collapse-button:focus {
+  border-color: #fd0;
+  outline: 3px solid rgba(0, 0, 0, 0);
+  -webkit-box-shadow: inset 0 0 0 1px #fd0;
+  box-shadow: inset 0 0 0 1px #fd0;
+  background: black;
+}

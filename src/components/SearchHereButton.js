@@ -51,7 +51,11 @@ function SearchHereButton({ map }) {
       onClick={renderMapItems}
       disabled={isDisabled}
       variant="secondary"
-      className={isDisabled ? "" : "SearchHereButton"}
+      className={
+        isDisabled
+          ? "govuk-button govuk-button--secondary"
+          : "SearchHereButton govuk-button govuk-button--secondary"
+      }
     >
       Search Here
     </Button>
