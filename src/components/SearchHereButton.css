@@ -16,6 +16,14 @@
 .govuk-button--secondary:hover {
   background-color: #dbdad9;
   border-color: #dbdad9;
+  color: #0b0c0c;
+}
+
+.btn.govuk-button.govuk-button--secondary:first-child:hover,
+:not(.btn-check) + .btn.govuk-button.govuk-button--secondary:hover {
+  background-color: #dbdad9;
+  border-color: #dbdad9;
+  color: #0b0c0c;
 }
 
 .govuk-button--secondary:hover[disabled] {

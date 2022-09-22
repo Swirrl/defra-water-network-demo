@@ -112,8 +112,10 @@
   border-color: #005a30;
 }
 
-.govuk-button:active {
-  top: 2px;
+.btn.govuk-button:first-child:hover,
+:not(.btn-check) + .btn.govuk-button:hover {
+  background-color: #005a30;
+  border-color: #005a30;
 }
 
 .govuk-button:focus {
