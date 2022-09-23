@@ -1,17 +1,34 @@
 import { getMapBoundingBox, bboxPolygon } from "../utils/map";
 
-export const waterNetworkAPIBase =
-  "https://defra-water-network-prod.publishmydata.com/water-network/api/v1";
-export const waterNetworkAPIKey = process.env.REACT_APP_WATER_NETWORK_API_KEY;
+const waterNetworkBaseURL =
+  // "https://defra-water-network-prod.publishmydata.com/water-network"
+  "http://localhost:3001/water-network";
+export const waterNetworkAPIBase = waterNetworkBaseURL + "/api/v1";
+export const waterNetworkAPIKey =
+  "dGVzdEBleGFtcGxlLmNvbTowYzlmNTJjNDJlOWEwZmRhNWNiMjBlNjQ4OWE3ZTYyYzQyYmNmY2I1";
+// "0c9f52c42e9a0fda5cb20e6489a7e62c42bcfcb5";
+// process.env.REACT_APP_WATER_NETWORK_API_KEY;
+
+const headers = {
+  Authorization: `Basic ${waterNetworkAPIKey}`,
+};
 
 export const getURL = async (url) => {
-  const headers = {
-    Authorization: `Basic ${waterNetworkAPIKey}`,
-  };
-
   return await fetch(url, { method: "GET", headers: headers }).then(
     (response) => response.json()
   );
+};
+
+const postURL = async (url, body) => {
+  return await fetch(url, {
+    method: "POST",
+    headers: {
+      ...headers,
+      Accept: "application.json",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  }).then((response) => response.json());
 };
 
 const getNextPageLink = (response) => {
@@ -84,4 +101,16 @@ export const getWatercourseLink = async (id) => {
 export const getHydroNode = async (id) => {
   const url = `${waterNetworkAPIBase}/collections/HydroNode/items/${id}`;
   return await getURL(url);
+};
+
+export const saveWatercourseLinkSiteAssociation = async (
+  watercourseLinkId,
+  site
+) => {
+  const url = waterNetworkBaseURL + "/associate-watercourse-link";
+
+  return await postURL(url, {
+    watercourse_link_id: watercourseLinkId,
+    site_url: site,
+  });
 };

@@ -2,6 +2,7 @@ import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-load
 
 import { highlightNearestWatercourseLink } from "../utils/nearest-wc-link-to-site";
 import { ensureHttps } from "./misc";
+import { saveWatercourseLinkSiteAssociation } from "../utils/water-network-data";
 
 const getLastURLSegment = (url) => {
   return url.split("/").pop();
@@ -37,10 +38,10 @@ const setWCLinkSelectMode = (val) => {
   window.WCLinkSelectMode = val;
 };
 
-const associateWatercourseLink = (siteURI) => {
+const enableAssociateWatercourseLinkMode = (siteURI) => {
+  // next watercourselink click gets associated
   closePopup();
   setWCLinkSelectMode(siteURI);
-  // next watercourselink click gets associated
 };
 
 const sitePopupHTML = (title, displayProps, url) => {
@@ -127,8 +128,27 @@ const newPopup = (coords, text, map) => {
 
   const button = document.getElementById("associate-wc-link-button");
   button?.addEventListener("click", (e) => {
-    return associateWatercourseLink(button.dataset.siteUri);
+    return enableAssociateWatercourseLinkMode(button.dataset.siteUri);
   });
+};
+
+const setWCLinkHoverMode = (map, wcLinkID, val) => {
+  if (wcLinkID) {
+    if (val) {
+      map.setFeatureState(
+        {
+          source: "watercourseLinks",
+          id: wcLinkID,
+        },
+        { hover: val }
+      );
+    } else {
+      map.removeFeatureState({
+        source: "watercourseLinks",
+        id: wcLinkID,
+      });
+    }
+  }
 };
 
 const getLatestCompleteReading = (readings) => {
@@ -247,54 +267,36 @@ export const setupLayerPopups = (map) => {
 
   // Setup WC link select mode -- highlight on hover
   let wcLinkID = null;
+
   map.on("mousemove", "watercourseLinks", (e) => {
     if (!window.WCLinkSelectMode) return;
     if (e.features.length === 0) return;
 
-    if (wcLinkID) {
-      map.removeFeatureState({
-        source: "watercourseLinks",
-        id: wcLinkID,
-      });
-    }
+    setWCLinkHoverMode(map, wcLinkID, false);
 
     wcLinkID = e.features[0].id;
-
-    map.setFeatureState(
-      {
-        source: "watercourseLinks",
-        id: wcLinkID,
-      },
-      { hover: true }
-    );
+    setWCLinkHoverMode(map, wcLinkID, true);
   });
 
   map.on("mouseleave", "watercourseLinks", (e) => {
     if (!window.WCLinkSelectMode) return;
 
-    if (wcLinkID) {
-      map.setFeatureState(
-        {
-          source: "watercourseLinks",
-          id: wcLinkID,
-        },
-        { hover: false }
-      );
-    }
+    setWCLinkHoverMode(map, wcLinkID, false);
     wcLinkID = null;
   });
 
-  map.on("click", "watercourseLinks", (e) => {
+  map.on("click", "watercourseLinks", async (e) => {
     if (!window.WCLinkSelectMode) return;
 
-    const watercourseLink = e.features[0]?.properties.id;
-    if (!watercourseLink) return;
+    const watercourseLinkId = e.features[0]?.properties.id;
+    if (!watercourseLinkId) return;
 
-    console.log(
-      "Save this watercourse link as associated with site:",
+    await saveWatercourseLinkSiteAssociation(
+      watercourseLinkId,
       window.WCLinkSelectMode
-    );
-
-    window.WCLinkSelectMode = null;
+    ).finally(() => {
+      window.WCLinkSelectMode = null;
+      setWCLinkHoverMode(map, wcLinkID, false);
+    });
   });
 };
