@@ -5,3 +5,7 @@ export const debounce = (func, timeout = 300) => {
     timer = setTimeout(func, timeout, ...args);
   };
 };
+
+export const ensureHttps = (url) => {
+  return url.replace(/http:/, "https:");
+};

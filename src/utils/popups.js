@@ -1,6 +1,7 @@
 import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 
 import { highlightNearestWatercourseLink } from "../utils/nearest-wc-link-to-site";
+import { ensureHttps } from "./misc";
 
 const getLastURLSegment = (url) => {
   return url.split("/").pop();
@@ -101,10 +102,15 @@ const getLatestFlowReadingInfo = async (url) => {
   const measures = await fetch(`${url}/measures`).then((response) =>
     response.json()
   );
-  const readingUnit = measures.items[0].unitName;
-  const reading = await fetch(
+
+  const readingEndpoint = ensureHttps(
     `${measures.items[0]["@id"]}/readings?latest`
-  ).then((response) => response.json());
+  );
+  const reading = await fetch(readingEndpoint).then((response) =>
+    response.json()
+  );
+  const readingUnit = measures.items[0].unitName;
+
   return `${reading.items[0].value} ${readingUnit} - ${reading.items[0].date}`;
 };
 
@@ -135,7 +141,8 @@ export const setupLayerPopups = (map) => {
     const coords = getCoords(e);
     const feature = e.features[0];
 
-    const flow = await getLatestFlowReadingInfo(feature.properties.uri);
+    const siteEndpoint = ensureHttps(feature.properties.uri);
+    const flow = await getLatestFlowReadingInfo(siteEndpoint);
     feature.properties.flow = flow;
 
     const text = sitePropertiesToHTML(feature);
