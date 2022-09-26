@@ -103,12 +103,12 @@ const setSitesInBoundingBox = async (map, corners, layer) => {
   });
 };
 
-const setRiverFlowSitesInBoundingBox = async (map, corners, layer) => {
+const setRiverFlowSitesInBoundingBox = async (map, corners) => {
   const query = riverFlowSitesQuery(corners);
   const csv = await fetch(query).then((response) => response.text());
 
   const sites = csvToGeoJSON(csv.replace(/"+/g, ""));
-  map.getSource(layer).setData(sites);
+  map.getSource("riverFlowSites").setData(sites);
 };
 
 export const displayMonitoringSitesFeaturesInMapViewport = async (map) => {
@@ -119,5 +119,5 @@ export const displayMonitoringSitesFeaturesInMapViewport = async (map) => {
   await setSitesInBoundingBox(map, corners, "waterQualitySites");
   await setSitesInBoundingBox(map, corners, "riverLevelSites");
   await setSitesInBoundingBox(map, corners, "freshwaterSites");
-  await setRiverFlowSitesInBoundingBox(map, corners, "riverFlowSites");
+  await setRiverFlowSitesInBoundingBox(map, corners);
 };
