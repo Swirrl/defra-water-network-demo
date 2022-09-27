@@ -1,6 +1,6 @@
 import { getMapBoundingBox, bboxPolygon } from "../utils/map";
 
-const waterNetworkBaseURL =
+export const waterNetworkBaseURL =
   // "https://defra-water-network-prod.publishmydata.com/water-network"
   "http://localhost:3001/water-network";
 export const waterNetworkAPIBase = waterNetworkBaseURL + "/api/v1";
@@ -9,7 +9,7 @@ export const waterNetworkAPIKey =
 // "0c9f52c42e9a0fda5cb20e6489a7e62c42bcfcb5";
 // process.env.REACT_APP_WATER_NETWORK_API_KEY;
 
-const headers = {
+export const headers = {
   Authorization: `Basic ${waterNetworkAPIKey}`,
 };
 
@@ -105,12 +105,12 @@ export const getHydroNode = async (id) => {
 
 export const saveWatercourseLinkSiteAssociation = async (
   watercourseLinkId,
-  site
+  siteURI
 ) => {
   const url = waterNetworkBaseURL + "/associate-watercourse-link";
 
   return await postURL(url, {
     watercourse_link_id: watercourseLinkId,
-    site_url: site,
+    site_uri: siteURI,
   });
 };

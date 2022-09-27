@@ -239,9 +239,10 @@ export const setupLayerPopups = (map) => {
 
       const coords = getCoords(e);
       const text = sitePropertiesToHTML(e.features[0]);
+      const site = e.features[0];
 
       newPopup(coords, text, map);
-      await highlightNearestWatercourseLink(coords, map);
+      await highlightNearestWatercourseLink(site, map);
     });
   }
 
