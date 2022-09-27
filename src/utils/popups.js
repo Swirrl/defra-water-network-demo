@@ -84,7 +84,7 @@ const sitePropertiesToHTML = ({ properties, source }) => {
   const displayProps = { Name: properties.label, URI: properties.uri };
 
   if (properties.flow) {
-    displayProps["Latest flow reading"] = properties.flow;
+    displayProps["Latest complete flow reading"] = properties.flow;
   }
 
   return popupTableHTML("Monitoring Site", displayProps, url);
@@ -98,20 +98,39 @@ const newPopup = (coords, text, map) => {
   return new mapboxgl.Popup().setLngLat(coords).setHTML(text).addTo(map);
 };
 
+const getLatestCompleteReading = (readings) => {
+  for (let i = 1; i <= readings.items.length; i++) {
+    if (readings.items[readings.items.length - i].completeness === "Complete") {
+      return readings.items[readings.items.length - i];
+    }
+  }
+};
+
 const getLatestFlowReadingInfo = async (url) => {
   const measures = await fetch(`${url}/measures`).then((response) =>
     response.json()
   );
 
-  const readingEndpoint = ensureHttps(
-    `${measures.items[0]["@id"]}/readings?latest`
+  // The latest reading can be "incomplete" and have no value
+  // So we're getting the readings from the last week and getting the latest "complete" one
+  const today = new Date();
+  const lastWeek = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate() - 7
+  )
+    .toJSON()
+    .slice(0, 10);
+  const readingsEndpoint = ensureHttps(
+    `${measures.items[0]["@id"]}/readings?mineq-date=${lastWeek}`
   );
-  const reading = await fetch(readingEndpoint).then((response) =>
+  const readings = await fetch(readingsEndpoint).then((response) =>
     response.json()
   );
   const readingUnit = measures.items[0].unitName;
+  const reading = getLatestCompleteReading(readings);
 
-  return `${reading.items[0].value} ${readingUnit} - ${reading.items[0].date}`;
+  return `${reading.value} ${readingUnit} - ${reading.date}`;
 };
 
 export const setupLayerPopups = (map) => {
