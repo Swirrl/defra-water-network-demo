@@ -3,6 +3,7 @@ import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-load
 
 import Search from "./Search";
 import SearchHereButton from "./SearchHereButton";
+import NoWatercourseLinkButton from "./NoWatercourseLinkButton";
 import LayerToggles from "./LayerToggles";
 
 import "./Map.css";
@@ -14,6 +15,8 @@ import { showWatercourseLink } from "../utils/wc-link-from-id";
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 
+export const MapContext = React.createContext(null);
+
 function Map() {
   const mapContainer = useRef(null);
   const map = useRef(null);
@@ -22,6 +25,7 @@ function Map() {
   const [zoom, setZoom] = useState(9);
   const [showSearch, setShowSearch] = useState(false);
   const [searchError, setSearchError] = useState(null);
+  const [showNoWCLinkButton, setShowNoWCLinkButton] = useState(false);
 
   const OSapiKey = process.env.REACT_APP_OS_API_KEY;
   const OSserviceUrl = "https://api.os.uk/maps/raster/v1/zxy";
@@ -78,7 +82,7 @@ function Map() {
       );
 
       setupEmptyOverlays(map.current);
-      setupLayerPopups(map.current);
+      setupLayerPopups(map.current, setShowNoWCLinkButton);
     });
   });
 
@@ -108,12 +112,13 @@ function Map() {
   });
 
   return (
-    <>
-      <Search map={map} initialShow={showSearch} initialError={searchError} />
+    <MapContext.Provider value={showNoWCLinkButton}>
+      <Search map={map} initialShow={showSearch} />
       <SearchHereButton map={map} />
+      <NoWatercourseLinkButton map={map} />
       <LayerToggles map={map} />
       <div ref={mapContainer} className="Map-container" />
-    </>
+    </MapContext.Provider>
   );
 }
 
