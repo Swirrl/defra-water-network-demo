@@ -152,3 +152,10 @@ export const bboxPolygon = ([swLng, swLat, neLng, neLat]) => {
     },
   };
 };
+
+export const unhighlightWatercourseLink = (map) => {
+  map.getSource("highlightWatercourseLink").setData({
+    type: "FeatureCollection",
+    features: [],
+  });
+};

@@ -34,7 +34,7 @@ const closePopup = () => {
 };
 
 window.WCLinkSelectMode = null;
-const setWCLinkSelectMode = (val, setMapContext) => {
+export const setWCLinkSelectMode = (val, setMapContext) => {
   setMapContext(val);
   window.WCLinkSelectMode = val;
 };
@@ -136,7 +136,7 @@ const newPopup = (coords, text, map, setMapContext) => {
   });
 };
 
-const setWCLinkHoverMode = (map, wcLinkID, val) => {
+export const setWCLinkHoverMode = (map, wcLinkID, val) => {
   if (wcLinkID) {
     if (val) {
       map.setFeatureState(

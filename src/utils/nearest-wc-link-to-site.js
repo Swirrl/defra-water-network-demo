@@ -4,6 +4,7 @@ import {
   getURL,
   headers,
 } from "../utils/water-network-data";
+import { unhighlightWatercourseLink } from "../utils/map";
 
 const getNearestWCLinkToPoint = async (coords) => {
   const url =
@@ -36,7 +37,10 @@ export const highlightNearestWatercourseLink = async (site, map) => {
 
   let wcLink = null;
 
-  if (userAssociatedWCLink) {
+  if (userAssociatedWCLink?.status === "No watercourse link") {
+    unhighlightWatercourseLink(map);
+    return;
+  } else if (userAssociatedWCLink) {
     wcLink = userAssociatedWCLink;
   } else {
     const coords = site.geometry.coordinates;
@@ -44,11 +48,4 @@ export const highlightNearestWatercourseLink = async (site, map) => {
   }
 
   map.getSource("highlightWatercourseLink").setData(wcLink);
-};
-
-export const unhighlightWatercourseLink = (map) => {
-  map.getSource("highlightWatercourseLink").setData({
-    type: "FeatureCollection",
-    features: [],
-  });
 };

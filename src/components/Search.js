@@ -12,7 +12,7 @@ import { OSGridToLatLng } from "../utils/coords";
 
 import "./Search.css";
 import { useNavigate } from "react-router-dom";
-import { unhighlightWatercourseLink } from "../utils/nearest-wc-link-to-site";
+import { unhighlightWatercourseLink } from "../utils/map";
 import { showWatercourseLink } from "../utils/wc-link-from-id";
 
 function Search({ map, initialShow, initialError }) {

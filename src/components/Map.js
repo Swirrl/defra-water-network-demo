@@ -25,7 +25,7 @@ function Map() {
   const [zoom, setZoom] = useState(9);
   const [showSearch, setShowSearch] = useState(false);
   const [searchError, setSearchError] = useState(null);
-  const [showNoWCLinkButton, setShowNoWCLinkButton] = useState(false);
+  const [showNoWCLinkButton, setShowNoWCLinkButton] = useState(null);
 
   const OSapiKey = process.env.REACT_APP_OS_API_KEY;
   const OSserviceUrl = "https://api.os.uk/maps/raster/v1/zxy";
@@ -115,7 +115,10 @@ function Map() {
     <MapContext.Provider value={showNoWCLinkButton}>
       <Search map={map} initialShow={showSearch} />
       <SearchHereButton map={map} />
-      <NoWatercourseLinkButton map={map} />
+      <NoWatercourseLinkButton
+        map={map}
+        setMapContext={setShowNoWCLinkButton}
+      />
       <LayerToggles map={map} />
       <div ref={mapContainer} className="Map-container" />
     </MapContext.Provider>
