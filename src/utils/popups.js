@@ -47,8 +47,9 @@ const enableAssociateWatercourseLinkMode = (siteURI, setMapContext) => {
 
 const sitePopupHTML = (title, displayProps, url) => {
   const rawAPILink = `<a target="_blank" href=${url}>Site API endpoint</a>`;
-  const associateWCLink = `<button class="btn btn-outline-secondary btn-sm mt-2"
+  const associateWCLink = `<button class="govuk-button btn-sm mt-3"
                                    id="associate-wc-link-button"
+                                   style="font-size:0.9rem"
                                    data-site-uri="${displayProps.URI}"
                            >Associate watercourse link</button>`;
 
@@ -106,18 +107,13 @@ const sitePropertiesToHTML = ({ properties, source }) => {
     url = properties.uri;
   }
 
-  return sitePopupHTML(
-    "Monitoring Site",
-    { Name: properties.label, URI: properties.uri },
-    url
-  );
   const displayProps = { Name: properties.label, URI: properties.uri };
 
   if (properties.flow) {
     displayProps["Latest complete flow reading"] = properties.flow;
   }
 
-  return popupTableHTML("Monitoring Site", displayProps, url);
+  return sitePopupHTML("Monitoring Site", displayProps, url);
 };
 
 const getCoords = (event) => {

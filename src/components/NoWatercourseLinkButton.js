@@ -6,7 +6,7 @@ import { saveWatercourseLinkSiteAssociation } from "../utils/water-network-data"
 import { setWCLinkSelectMode, setWCLinkHoverMode } from "../utils/popups";
 import { unhighlightWatercourseLink } from "../utils/map";
 
-export const NO_WC_LINK = "NO_WC_LINK_OVERRIDE";
+const NO_WC_LINK = "NO_WC_LINK_OVERRIDE";
 
 function NoWatercourseLinkButton({ map, setMapContext }) {
   const selectModeCurrentSite = useContext(MapContext);
@@ -26,7 +26,7 @@ function NoWatercourseLinkButton({ map, setMapContext }) {
   return (
     selectModeCurrentSite && (
       <Button
-        className="NoWatercourseLinkButton"
+        className="NoWatercourseLinkButton govuk-button"
         variant="warning"
         onClick={selectNoWatercourseLink}
       >

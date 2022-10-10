@@ -113,7 +113,7 @@ function Map() {
 
   return (
     <MapContext.Provider value={showNoWCLinkButton}>
-      <Search map={map} initialShow={showSearch} />
+      <Search map={map} initialShow={showSearch} initialError={searchError} />
       <SearchHereButton map={map} />
       <NoWatercourseLinkButton
         map={map}
