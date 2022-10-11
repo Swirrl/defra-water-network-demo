@@ -213,15 +213,16 @@ export const setupLayerPopups = (map, setMapContext) => {
     if (e.originalEvent.defaultPrevented) return;
     e.originalEvent.preventDefault();
     const coords = getCoords(e);
-    const feature = e.features[0];
+    const site = e.features[0];
 
-    const siteEndpoint = ensureHttps(feature.properties.uri);
+    const siteEndpoint = ensureHttps(site.properties.uri);
     const flow = await getLatestFlowReadingInfo(siteEndpoint);
-    feature.properties.flow = flow;
 
-    const text = sitePropertiesToHTML(feature);
-    newPopup(coords, text, map);
-    await highlightNearestWatercourseLink(coords, map);
+    site.properties.flow = flow;
+    const text = sitePropertiesToHTML(site);
+
+    newPopup(coords, text, map, setMapContext);
+    await highlightNearestWatercourseLink(site, map);
   });
 
   for (const layer of [
@@ -238,8 +239,8 @@ export const setupLayerPopups = (map, setMapContext) => {
       e.originalEvent.preventDefault();
 
       const coords = getCoords(e);
-      const text = sitePropertiesToHTML(e.features[0]);
       const site = e.features[0];
+      const text = sitePropertiesToHTML(site);
 
       newPopup(coords, text, map, setMapContext);
       await highlightNearestWatercourseLink(site, map);
