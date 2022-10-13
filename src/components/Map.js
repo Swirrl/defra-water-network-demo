@@ -98,7 +98,7 @@ function Map() {
   useEffect(() => {
     if (!map.current) return; // wait for map to initialize
 
-    map.current.once("idle", () => {
+    map.current.once("load", () => {
       if (watercourseLinkId) {
         setShowSearch(false);
         showWatercourseLink(watercourseLinkId, map).catch((error) => {
