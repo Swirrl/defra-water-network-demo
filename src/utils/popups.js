@@ -2,6 +2,7 @@ import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-load
 
 import { highlightNearestWatercourseLink } from "../utils/nearest-wc-link-to-site";
 import { ensureHttps } from "./misc";
+import { saveWatercourseLinkSiteAssociation } from "../utils/water-network-data";
 
 const getLastURLSegment = (url) => {
   return url.split("/").pop();
@@ -18,18 +19,43 @@ const toTableCells = (displayProps) => {
     .join("");
 };
 
-const popupTableHTML = (title, displayProps, url) => {
-  let link = "";
-
-  if (url) {
-    link = `<tr><a target="_blank" href=${url}>Site API endpoint</a></tr>`;
-  }
-
+const basicPopupTableHTML = (title, displayProps) => {
   return `<table>
        <caption style="font-weight: bold; caption-side: top">${title}</caption>
         ${toTableCells(displayProps)}
-     </table>
-     ${link}`;
+     </table>`;
+};
+
+const closePopup = () => {
+  const popups = document.getElementsByClassName("mapboxgl-popup");
+  for (const popup of popups) {
+    popup.remove();
+  }
+};
+
+window.WCLinkSelectMode = null;
+export const setWCLinkSelectMode = (val, setMapContext) => {
+  setMapContext(val);
+  window.WCLinkSelectMode = val;
+};
+
+const enableAssociateWatercourseLinkMode = (siteURI, setMapContext) => {
+  // next watercourselink click gets associated
+  closePopup();
+  setWCLinkSelectMode(siteURI, setMapContext);
+};
+
+const sitePopupHTML = (title, displayProps, url) => {
+  const rawAPILink = `<a target="_blank" href=${url}>Site API endpoint</a>`;
+  const associateWCLink = `<button class="govuk-button btn-sm mt-3"
+                                   id="associate-wc-link-button"
+                                   style="font-size:0.9rem"
+                                   data-site-uri="${displayProps.URI}"
+                           >Associate watercourse link</button>`;
+
+  return `${basicPopupTableHTML(title, displayProps)}
+          ${rawAPILink}
+          ${associateWCLink}`;
 };
 
 const hydroNodePropertiesToHTML = ({ properties }) => {
@@ -38,7 +64,7 @@ const hydroNodePropertiesToHTML = ({ properties }) => {
     Category: getLastURLSegment(properties.hydroNodeCategory),
   };
 
-  return popupTableHTML("Hydro Node", displayProps);
+  return basicPopupTableHTML("Hydro Node", displayProps);
 };
 
 const watercourseLinkPropertiesToHTML = ({ properties }) => {
@@ -64,7 +90,7 @@ const watercourseLinkPropertiesToHTML = ({ properties }) => {
     displayProps["Catchment ID"] = properties.catchmentId;
   }
 
-  return popupTableHTML("Watercourse Link", displayProps);
+  return basicPopupTableHTML("Watercourse Link", displayProps);
 };
 
 const sitePropertiesToHTML = ({ properties, source }) => {
@@ -87,15 +113,42 @@ const sitePropertiesToHTML = ({ properties, source }) => {
     displayProps["Latest complete flow reading"] = properties.flow;
   }
 
-  return popupTableHTML("Monitoring Site", displayProps, url);
+  return sitePopupHTML("Monitoring Site", displayProps, url);
 };
 
 const getCoords = (event) => {
   return event.features[0].geometry.coordinates;
 };
 
-const newPopup = (coords, text, map) => {
-  return new mapboxgl.Popup().setLngLat(coords).setHTML(text).addTo(map);
+const newPopup = (coords, text, map, setMapContext) => {
+  new mapboxgl.Popup().setLngLat(coords).setHTML(text).addTo(map);
+
+  const button = document.getElementById("associate-wc-link-button");
+  button?.addEventListener("click", (e) => {
+    return enableAssociateWatercourseLinkMode(
+      button.dataset.siteUri,
+      setMapContext
+    );
+  });
+};
+
+export const setWCLinkHoverMode = (map, wcLinkID, val) => {
+  if (wcLinkID) {
+    if (val) {
+      map.setFeatureState(
+        {
+          source: "watercourseLinks",
+          id: wcLinkID,
+        },
+        { hover: val }
+      );
+    } else {
+      map.removeFeatureState({
+        source: "watercourseLinks",
+        id: wcLinkID,
+      });
+    }
+  }
 };
 
 const getLatestCompleteReading = (readings) => {
@@ -133,40 +186,43 @@ const getLatestFlowReadingInfo = async (url) => {
   return `${reading.value} ${readingUnit} - ${reading.date}`;
 };
 
-export const setupLayerPopups = (map) => {
+export const setupLayerPopups = (map, setMapContext) => {
   map.on("click", "hydroNodes", (e) => {
+    if (window.WCLinkSelectMode) return;
     if (e.originalEvent.defaultPrevented) return;
     e.originalEvent.preventDefault();
 
     const coords = getCoords(e);
     const text = hydroNodePropertiesToHTML(e.features[0]);
 
-    newPopup(coords, text, map);
+    newPopup(coords, text, map, setMapContext);
   });
 
   map.on("click", "watercourseLinks", (e) => {
+    if (window.WCLinkSelectMode) return;
     if (e.originalEvent.defaultPrevented) return;
     e.originalEvent.preventDefault();
 
     const coords = e.lngLat;
     const text = watercourseLinkPropertiesToHTML(e.features[0]);
 
-    newPopup(coords, text, map);
+    newPopup(coords, text, map, setMapContext);
   });
 
   map.on("click", "riverFlowSites", async (e) => {
     if (e.originalEvent.defaultPrevented) return;
     e.originalEvent.preventDefault();
     const coords = getCoords(e);
-    const feature = e.features[0];
+    const site = e.features[0];
 
-    const siteEndpoint = ensureHttps(feature.properties.uri);
+    const siteEndpoint = ensureHttps(site.properties.uri);
     const flow = await getLatestFlowReadingInfo(siteEndpoint);
-    feature.properties.flow = flow;
 
-    const text = sitePropertiesToHTML(feature);
-    newPopup(coords, text, map);
-    await highlightNearestWatercourseLink(coords, map);
+    site.properties.flow = flow;
+    const text = sitePropertiesToHTML(site);
+
+    newPopup(coords, text, map, setMapContext);
+    await highlightNearestWatercourseLink(site, map);
   });
 
   for (const layer of [
@@ -176,14 +232,18 @@ export const setupLayerPopups = (map) => {
     "freshwaterSites",
   ]) {
     map.on("click", layer, async (e) => {
+      // don't open popups in select mode
+      if (window.WCLinkSelectMode) return;
+
       if (e.originalEvent.defaultPrevented) return;
       e.originalEvent.preventDefault();
 
       const coords = getCoords(e);
-      const text = sitePropertiesToHTML(e.features[0]);
+      const site = e.features[0];
+      const text = sitePropertiesToHTML(site);
 
-      newPopup(coords, text, map);
-      await highlightNearestWatercourseLink(coords, map);
+      newPopup(coords, text, map, setMapContext);
+      await highlightNearestWatercourseLink(site, map);
     });
   }
 
@@ -206,4 +266,44 @@ export const setupLayerPopups = (map) => {
       map.getCanvas().style.cursor = "";
     });
   }
+
+  // Setup WC link select mode -- highlight on hover
+  let wcLinkID = null;
+
+  map.on("mousemove", "watercourseLinks", (e) => {
+    if (!window.WCLinkSelectMode) return;
+    if (e.features.length === 0) return;
+
+    setWCLinkHoverMode(map, wcLinkID, false);
+
+    wcLinkID = e.features[0].id;
+    setWCLinkHoverMode(map, wcLinkID, true);
+  });
+
+  map.on("mouseleave", "watercourseLinks", (e) => {
+    if (!window.WCLinkSelectMode) return;
+
+    setWCLinkHoverMode(map, wcLinkID, false);
+    wcLinkID = null;
+  });
+
+  map.on("click", "watercourseLinks", async (e) => {
+    if (!window.WCLinkSelectMode) return;
+
+    const watercourseLink = e.features[0];
+    const watercourseLinkId = watercourseLink?.properties.id;
+    if (!watercourseLinkId) return;
+
+    await saveWatercourseLinkSiteAssociation(
+      watercourseLinkId,
+      window.WCLinkSelectMode
+    )
+      .then(() => {
+        map.getSource("highlightWatercourseLink").setData(watercourseLink);
+      })
+      .finally(() => {
+        setWCLinkSelectMode(false, setMapContext);
+        setWCLinkHoverMode(map, wcLinkID, false);
+      });
+  });
 };

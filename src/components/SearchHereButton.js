@@ -9,7 +9,7 @@ import { debounce } from "../utils/misc";
 
 import "./SearchHereButton.css";
 import { useNavigate } from "react-router-dom";
-import { unhighlightWatercourseLink } from "../utils/nearest-wc-link-to-site";
+import { unhighlightWatercourseLink } from "../utils/map";
 
 function SearchHereButton({ map }) {
   const navigate = useNavigate();

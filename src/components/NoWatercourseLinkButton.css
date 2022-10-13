@@ -1,0 +1,6 @@
+.NoWatercourseLinkButton {
+  position: absolute;
+  z-index: 1;
+  bottom: 18rem;
+  left: 1rem;
+}
