@@ -1,13 +1,9 @@
 import { getMapBoundingBox, bboxPolygon } from "../utils/map";
 
 export const waterNetworkBaseURL =
-  // "https://defra-water-network-prod.publishmydata.com/water-network"
-  "http://localhost:3001/water-network";
+  "https://defra-water-network-prod.publishmydata.com/water-network";
 export const waterNetworkAPIBase = waterNetworkBaseURL + "/api/v1";
-export const waterNetworkAPIKey =
-  "dGVzdEBleGFtcGxlLmNvbTowYzlmNTJjNDJlOWEwZmRhNWNiMjBlNjQ4OWE3ZTYyYzQyYmNmY2I1";
-// "0c9f52c42e9a0fda5cb20e6489a7e62c42bcfcb5";
-// process.env.REACT_APP_WATER_NETWORK_API_KEY;
+export const waterNetworkAPIKey = process.env.REACT_APP_WATER_NETWORK_API_KEY;
 
 export const headers = {
   Authorization: `Basic ${waterNetworkAPIKey}`,
