@@ -2,7 +2,11 @@ import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-load
 
 import { highlightNearestWatercourseLink } from "../utils/nearest-wc-link-to-site";
 import { ensureHttps } from "./misc";
-import { saveWatercourseLinkSiteAssociation } from "../utils/water-network-data";
+import {
+  saveWatercourseLinkSiteAssociation,
+  getURL,
+  waterNetworkAPIBase,
+} from "../utils/water-network-data";
 
 const getLastURLSegment = (url) => {
   return url.split("/").pop();
@@ -31,6 +35,48 @@ const closePopup = () => {
   for (const popup of popups) {
     popup.remove();
   }
+};
+
+const wcLinkPopupHTML = (title, displayProps) => {
+  const upstreamWCLinks = `<button class="govuk-button btn-sm mt-3"
+                                   id="upstream-button"
+                                   style="font-size:0.9rem; margin:0"
+                                   data-wc-link-id="${displayProps.ID}"
+                           >Show upstream watercourse links</button>`;
+
+  const downstreamWCLinks = `<button class="govuk-button btn-sm mt-3"
+                           id="downstream-button"
+                           style="font-size:0.9rem; margin:0"
+                           data-wc-link-id="${displayProps.ID}"
+                   >Show downstream watercourse links</button>`;
+
+  return `${basicPopupTableHTML(title, displayProps)}
+          ${upstreamWCLinks}
+          ${downstreamWCLinks}`;
+};
+
+const getUpstream = async (id) => {
+  const url = `${waterNetworkAPIBase}/collections/WatercourseLink/items/${id}/upstream`;
+  return await getURL(url);
+};
+// TODO: catch 404s
+const highlightUpstreamWatercourseLinks = async (id, map) => {
+  await getUpstream(id).then((watercourseLinks) => {
+    closePopup();
+    map.getSource("highlightWatercourseLink").setData(watercourseLinks);
+  });
+};
+
+const getDownstream = async (id) => {
+  const url = `${waterNetworkAPIBase}/collections/WatercourseLink/items/${id}/downstream`;
+  return await getURL(url);
+};
+
+const highlightDownstreamWatercourseLinks = async (id, map) => {
+  await getDownstream(id).then((watercourseLinks) => {
+    closePopup();
+    map.getSource("highlightWatercourseLink").setData(watercourseLinks);
+  });
 };
 
 window.WCLinkSelectMode = null;
@@ -90,7 +136,7 @@ const watercourseLinkPropertiesToHTML = ({ properties }) => {
     displayProps["Catchment ID"] = properties.catchmentId;
   }
 
-  return basicPopupTableHTML("Watercourse Link", displayProps);
+  return wcLinkPopupHTML("Watercourse Link", displayProps);
 };
 
 const sitePropertiesToHTML = ({ properties, source }) => {
@@ -123,11 +169,29 @@ const getCoords = (event) => {
 const newPopup = (coords, text, map, setMapContext) => {
   new mapboxgl.Popup().setLngLat(coords).setHTML(text).addTo(map);
 
-  const button = document.getElementById("associate-wc-link-button");
-  button?.addEventListener("click", (e) => {
+  const associateWCLinkButton = document.getElementById(
+    "associate-wc-link-button"
+  );
+  associateWCLinkButton?.addEventListener("click", (e) => {
     return enableAssociateWatercourseLinkMode(
-      button.dataset.siteUri,
+      associateWCLinkButton.dataset.siteUri,
       setMapContext
+    );
+  });
+
+  const upstreamButton = document.getElementById("upstream-button");
+  upstreamButton?.addEventListener("click", async (e) => {
+    return highlightUpstreamWatercourseLinks(
+      upstreamButton.dataset.wcLinkId,
+      map
+    );
+  });
+
+  const downstreamButton = document.getElementById("downstream-button");
+  downstreamButton?.addEventListener("click", async (e) => {
+    return highlightDownstreamWatercourseLinks(
+      downstreamButton.dataset.wcLinkId,
+      map
     );
   });
 };
