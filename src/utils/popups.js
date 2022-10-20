@@ -61,9 +61,9 @@ const getUpstream = async (id) => {
 };
 // TODO: catch 404s
 const highlightUpstreamWatercourseLinks = async (id, map) => {
-  await getUpstream(id).then((watercourseLinks) => {
+  await getUpstream(id).then((upstreamWatercourseLinks) => {
     closePopup();
-    map.getSource("highlightWatercourseLink").setData(watercourseLinks);
+    map.getSource("upstreamWatercourseLinks").setData(upstreamWatercourseLinks);
   });
 };
 
@@ -73,9 +73,11 @@ const getDownstream = async (id) => {
 };
 
 const highlightDownstreamWatercourseLinks = async (id, map) => {
-  await getDownstream(id).then((watercourseLinks) => {
+  await getDownstream(id).then((downstreamWatercourseLinks) => {
     closePopup();
-    map.getSource("highlightWatercourseLink").setData(watercourseLinks);
+    map
+      .getSource("downstreamWatercourseLinks")
+      .setData(downstreamWatercourseLinks);
   });
 };
 
