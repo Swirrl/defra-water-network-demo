@@ -78,15 +78,21 @@ export const displayWaterNetworkFeaturesInMapViewport = async (map) => {
   const box = bboxPolygon(mapBounds);
   map.getSource("bbox").setData(box);
 
-  await getFeaturesInBoundingBox("HydroNode", mapBounds).then((hydroNodes) => {
-    map.getSource("hydroNodes").setData(hydroNodes);
-  });
+  await getFeaturesInBoundingBox("HydroNode", mapBounds)
+    .then((hydroNodes) => {
+      map.getSource("hydroNodes").setData(hydroNodes);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 
-  await getFeaturesInBoundingBox("WatercourseLink", mapBounds).then(
-    (watercourseLinks) => {
+  await getFeaturesInBoundingBox("WatercourseLink", mapBounds)
+    .then((watercourseLinks) => {
       map.getSource("watercourseLinks").setData(watercourseLinks);
-    }
-  );
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 };
 
 export const getWatercourseLink = async (id) => {
