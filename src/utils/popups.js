@@ -6,7 +6,9 @@ import {
   saveWatercourseLinkSiteAssociation,
   getURL,
   waterNetworkAPIBase,
+  mergeFeatures,
 } from "../utils/water-network-data";
+import { bboxPolygon, getMapBoundingBox } from "./map";
 
 const getLastURLSegment = (url) => {
   return url.split("/").pop();
@@ -61,10 +63,33 @@ const getUpstream = async (id) => {
 };
 // TODO: catch 404s
 const highlightUpstreamWatercourseLinks = async (id, map) => {
-  await getUpstream(id).then((upstreamWatercourseLinks) => {
+  await getUpstream(id).then(async (upstreamWatercourseLinks) => {
     closePopup();
+    const renderedWcLinks = map.querySourceFeatures("watercourseLinks");
+    const allWcLinks = mergeFeatures(upstreamWatercourseLinks, renderedWcLinks);
+
+    map.getSource("watercourseLinks").setData(allWcLinks);
     map.getSource("upstreamWatercourseLinks").setData(upstreamWatercourseLinks);
+
+    fitMapToFeatures(map, allWcLinks.features);
+    await map.once("idle");
+
+    const mapBounds = getMapBoundingBox(map);
+    const box = bboxPolygon(mapBounds);
+    map.getSource("bbox").setData(box);
   });
+};
+
+const fitMapToFeatures = (map, features) => {
+  var bounds = new mapboxgl.LngLatBounds();
+
+  features.forEach((feature) => {
+    feature.geometry.coordinates.forEach((coords) => {
+      bounds.extend(coords);
+    });
+  });
+
+  map.fitBounds(bounds, { padding: 20 });
 };
 
 const getDownstream = async (id) => {

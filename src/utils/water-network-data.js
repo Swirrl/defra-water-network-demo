@@ -39,12 +39,12 @@ const getNextPageLink = (response) => {
   }
 };
 
-const mergeFeatures = (response, nextPageResponse) => {
-  const allFeatures = response.features.concat(...nextPageResponse.features);
+export const mergeFeatures = (response, otherFeatures) => {
+  const allFeatures = otherFeatures.concat(...response.features);
   return {
-    ...nextPageResponse,
+    ...response,
     features: allFeatures,
-    numberReturned: response.numberReturned + nextPageResponse.numberReturned,
+    numberReturned: otherFeatures.length + response.numberReturned,
   };
 };
 
@@ -53,7 +53,7 @@ const getBBoxPages = async (response) => {
 
   if (nextPageLink) {
     const nextPageResponse = await getURL(nextPageLink);
-    const nextResponse = mergeFeatures(response, nextPageResponse);
+    const nextResponse = mergeFeatures(nextPageResponse, response.features);
     return getBBoxPages(nextResponse);
   } else {
     return response;
