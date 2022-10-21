@@ -224,3 +224,16 @@ export const unhighlightWatercourseLink = (map) => {
     features: [],
   });
 };
+
+export const clearUpstreamDownstream = (map) => {
+  map.getSource("upstreamWatercourseLinks").setData({
+    type: "FeatureCollection",
+    features: [],
+  });
+
+  map.getSource("downstreamWatercourseLinks").setData({
+    type: "FeatureCollection",
+    features: [],
+  });
+};
+

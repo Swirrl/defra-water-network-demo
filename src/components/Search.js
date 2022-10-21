@@ -12,7 +12,10 @@ import { OSGridToLatLng } from "../utils/coords";
 
 import "./Search.css";
 import { useNavigate } from "react-router-dom";
-import { unhighlightWatercourseLink } from "../utils/map";
+import {
+  clearUpstreamDownstream,
+  unhighlightWatercourseLink,
+} from "../utils/map";
 import { showWatercourseLink } from "../utils/wc-link-from-id";
 
 function Search({ map, initialShow, initialError }) {
@@ -71,6 +74,7 @@ function Search({ map, initialShow, initialError }) {
     setResults([]);
     navigate("/");
     unhighlightWatercourseLink(map.current);
+    clearUpstreamDownstream(map.current);
     await displayWaterNetworkFeaturesInMapViewport(map.current);
     await displayMonitoringSitesFeaturesInMapViewport(map.current);
   };
