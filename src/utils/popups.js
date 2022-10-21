@@ -86,9 +86,15 @@ const highlightUpstreamWatercourseLinks = async (id, map) => {
   await getUpstream(id).then(async (upstreamWatercourseLinks) => {
     closePopup();
     const renderedWcLinks = map.querySourceFeatures("watercourseLinks");
+    const renderedHNs = map.querySourceFeatures("hydroNodes");
+
     const allWcLinks = mergeFeatures(upstreamWatercourseLinks, renderedWcLinks);
 
     map.getSource("watercourseLinks").setData(allWcLinks);
+    map.getSource("hydroNodes").setData({
+      type: "FeatureCollection",
+      features: [...renderedHNs],
+    });
     map.getSource("upstreamWatercourseLinks").setData(upstreamWatercourseLinks);
 
     fitMapToFeatures(map, allWcLinks.features);
@@ -109,12 +115,17 @@ const highlightDownstreamWatercourseLinks = async (id, map) => {
   await getDownstream(id).then(async (downstreamWatercourseLinks) => {
     closePopup();
     const renderedWcLinks = map.querySourceFeatures("watercourseLinks");
+    const renderedHNs = map.querySourceFeatures("hydroNodes");
     const allWcLinks = mergeFeatures(
       downstreamWatercourseLinks,
       renderedWcLinks
     );
 
     map.getSource("watercourseLinks").setData(allWcLinks);
+    map.getSource("hydroNodes").setData({
+      type: "FeatureCollection",
+      features: [...renderedHNs],
+    });
     map
       .getSource("downstreamWatercourseLinks")
       .setData(downstreamWatercourseLinks);
