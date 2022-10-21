@@ -57,6 +57,26 @@ const wcLinkPopupHTML = (title, displayProps) => {
           ${downstreamWCLinks}`;
 };
 
+const fitMapToFeatures = (map, features) => {
+  var bounds = new mapboxgl.LngLatBounds();
+
+  features.forEach((feature) => {
+    if (feature.geometry.type === "LineString") {
+      feature.geometry.coordinates.forEach((coords) => {
+        bounds.extend(coords);
+      });
+    } else if (feature.geometry.type === "MultiLineString") {
+      feature.geometry.coordinates.forEach((line) => {
+        line.forEach((coords) => {
+          bounds.extend(coords);
+        });
+      });
+    }
+  });
+
+  map.fitBounds(bounds, { padding: 20 });
+};
+
 const getUpstream = async (id) => {
   const url = `${waterNetworkAPIBase}/collections/WatercourseLink/items/${id}/upstream`;
   return await getURL(url);
@@ -78,18 +98,6 @@ const highlightUpstreamWatercourseLinks = async (id, map) => {
     const box = bboxPolygon(mapBounds);
     map.getSource("bbox").setData(box);
   });
-};
-
-const fitMapToFeatures = (map, features) => {
-  var bounds = new mapboxgl.LngLatBounds();
-
-  features.forEach((feature) => {
-    feature.geometry.coordinates.forEach((coords) => {
-      bounds.extend(coords);
-    });
-  });
-
-  map.fitBounds(bounds, { padding: 20 });
 };
 
 const getDownstream = async (id) => {
