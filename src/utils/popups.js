@@ -106,11 +106,25 @@ const getDownstream = async (id) => {
 };
 
 const highlightDownstreamWatercourseLinks = async (id, map) => {
-  await getDownstream(id).then((downstreamWatercourseLinks) => {
+  await getDownstream(id).then(async (downstreamWatercourseLinks) => {
     closePopup();
+    const renderedWcLinks = map.querySourceFeatures("watercourseLinks");
+    const allWcLinks = mergeFeatures(
+      downstreamWatercourseLinks,
+      renderedWcLinks
+    );
+
+    map.getSource("watercourseLinks").setData(allWcLinks);
     map
       .getSource("downstreamWatercourseLinks")
       .setData(downstreamWatercourseLinks);
+
+    fitMapToFeatures(map, allWcLinks.features);
+    await map.once("idle");
+
+    const mapBounds = getMapBoundingBox(map);
+    const box = bboxPolygon(mapBounds);
+    map.getSource("bbox").setData(box);
   });
 };
 
