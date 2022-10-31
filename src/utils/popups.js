@@ -83,27 +83,27 @@ const getUpstream = async (id) => {
 };
 // TODO: catch 404s
 const highlightUpstreamWatercourseLinks = async (id, map) => {
-  await getUpstream(id).then(async (upstreamWatercourseLinks) => {
-    closePopup();
-    const renderedWcLinks = map.querySourceFeatures("watercourseLinks");
-    const renderedHNs = map.querySourceFeatures("hydroNodes");
+  const upstreamWcLinks = await getUpstream(id);
+  closePopup();
 
-    const allWcLinks = mergeFeatures(upstreamWatercourseLinks, renderedWcLinks);
+  const renderedWcLinks = map.querySourceFeatures("watercourseLinks");
+  const renderedHNs = map.querySourceFeatures("hydroNodes");
 
-    map.getSource("watercourseLinks").setData(allWcLinks);
-    map.getSource("hydroNodes").setData({
-      type: "FeatureCollection",
-      features: [...renderedHNs],
-    });
-    map.getSource("upstreamWatercourseLinks").setData(upstreamWatercourseLinks);
+  const allWcLinks = mergeFeatures(upstreamWcLinks, renderedWcLinks);
 
-    fitMapToFeatures(map, allWcLinks.features);
-    await map.once("idle");
-
-    const mapBounds = getMapBoundingBox(map);
-    const box = bboxPolygon(mapBounds);
-    map.getSource("bbox").setData(box);
+  map.getSource("watercourseLinks").setData(allWcLinks);
+  map.getSource("hydroNodes").setData({
+    type: "FeatureCollection",
+    features: [...renderedHNs],
   });
+  map.getSource("upstreamWatercourseLinks").setData(upstreamWcLinks);
+
+  fitMapToFeatures(map, allWcLinks.features);
+  await map.once("idle");
+
+  const mapBounds = getMapBoundingBox(map);
+  const box = bboxPolygon(mapBounds);
+  map.getSource("bbox").setData(box);
 };
 
 const getDownstream = async (id) => {
