@@ -1,3 +1,6 @@
+import chevronPink from "./icons/chevronPink.svg";
+import chevronBlue from "./icons/chevronBlue.svg";
+
 export const getMapBoundingBox = (map) => {
   const { _sw, _ne } = map.getBounds();
   return [_sw.lng, _sw.lat, _ne.lng, _ne.lat];
@@ -67,6 +70,68 @@ export const setupEmptyOverlays = (map) => {
     paint: {
       "line-color": "red",
       "line-width": 8,
+    },
+  });
+
+  addGeoJSONSource(map, "upstreamWatercourseLinks");
+  map.addLayer({
+    id: "upstreamWatercourseLinks",
+    type: "line",
+    source: "upstreamWatercourseLinks",
+    layout: {
+      "line-join": "round",
+      "line-cap": "round",
+    },
+    paint: {
+      "line-color": "pink",
+      "line-width": 8,
+    },
+  });
+
+  const upstreamIcon = new Image(8, 8);
+  upstreamIcon.src = chevronPink;
+  upstreamIcon.onload = () => map.addImage("upstreamIcon", upstreamIcon);
+  map.addLayer({
+    id: "upstreamWatercourseLinksArrows",
+    type: "symbol",
+    source: "upstreamWatercourseLinks",
+    paint: {},
+    layout: {
+      "symbol-placement": "line",
+      "symbol-spacing": 20,
+      "icon-image": "upstreamIcon",
+      "icon-rotate": 90,
+    },
+  });
+
+  addGeoJSONSource(map, "downstreamWatercourseLinks");
+  map.addLayer({
+    id: "downstreamWatercourseLinks",
+    type: "line",
+    source: "downstreamWatercourseLinks",
+    layout: {
+      "line-join": "round",
+      "line-cap": "round",
+    },
+    paint: {
+      "line-color": "light blue",
+      "line-width": 8,
+    },
+  });
+
+  const downstreamIcon = new Image(8, 8);
+  downstreamIcon.src = chevronBlue;
+  downstreamIcon.onload = () => map.addImage("downstreamIcon", downstreamIcon);
+  map.addLayer({
+    id: "downstreamWatercourseLinksArrows",
+    type: "symbol",
+    source: "downstreamWatercourseLinks",
+    paint: {},
+    layout: {
+      "symbol-placement": "line",
+      "symbol-spacing": 20,
+      "icon-image": "downstreamIcon",
+      "icon-rotate": 90,
     },
   });
 
@@ -159,3 +224,16 @@ export const unhighlightWatercourseLink = (map) => {
     features: [],
   });
 };
+
+export const clearUpstreamDownstream = (map) => {
+  map.getSource("upstreamWatercourseLinks").setData({
+    type: "FeatureCollection",
+    features: [],
+  });
+
+  map.getSource("downstreamWatercourseLinks").setData({
+    type: "FeatureCollection",
+    features: [],
+  });
+};
+

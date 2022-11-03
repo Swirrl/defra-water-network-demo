@@ -9,7 +9,10 @@ import { debounce } from "../utils/misc";
 
 import "./SearchHereButton.css";
 import { useNavigate } from "react-router-dom";
-import { unhighlightWatercourseLink } from "../utils/map";
+import {
+  clearUpstreamDownstream,
+  unhighlightWatercourseLink,
+} from "../utils/map";
 
 function SearchHereButton({ map }) {
   const navigate = useNavigate();
@@ -17,6 +20,7 @@ function SearchHereButton({ map }) {
   const renderMapItems = async () => {
     navigate("/");
     unhighlightWatercourseLink(map.current);
+    clearUpstreamDownstream(map.current);
     await displayWaterNetworkFeaturesInMapViewport(map.current);
     await displayMonitoringSitesFeaturesInMapViewport(map.current);
   };

@@ -42,6 +42,7 @@
 
 .SearchHereButton-tooltip-overlay,
 .SearchHereButton {
+  margin-bottom: 0;
   position: absolute;
   z-index: 1;
   top: 4rem;

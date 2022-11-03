@@ -39,12 +39,12 @@ const getNextPageLink = (response) => {
   }
 };
 
-const mergeFeatures = (response, nextPageResponse) => {
-  const allFeatures = response.features.concat(...nextPageResponse.features);
+export const mergeFeatures = (response, otherFeatures) => {
+  const allFeatures = otherFeatures.concat(...response.features);
   return {
-    ...nextPageResponse,
+    ...response,
     features: allFeatures,
-    numberReturned: response.numberReturned + nextPageResponse.numberReturned,
+    numberReturned: otherFeatures.length + response.numberReturned,
   };
 };
 
@@ -53,7 +53,7 @@ const getBBoxPages = async (response) => {
 
   if (nextPageLink) {
     const nextPageResponse = await getURL(nextPageLink);
-    const nextResponse = mergeFeatures(response, nextPageResponse);
+    const nextResponse = mergeFeatures(nextPageResponse, response.features);
     return getBBoxPages(nextResponse);
   } else {
     return response;
@@ -78,15 +78,21 @@ export const displayWaterNetworkFeaturesInMapViewport = async (map) => {
   const box = bboxPolygon(mapBounds);
   map.getSource("bbox").setData(box);
 
-  await getFeaturesInBoundingBox("HydroNode", mapBounds).then((hydroNodes) => {
-    map.getSource("hydroNodes").setData(hydroNodes);
-  });
+  await getFeaturesInBoundingBox("HydroNode", mapBounds)
+    .then((hydroNodes) => {
+      map.getSource("hydroNodes").setData(hydroNodes);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 
-  await getFeaturesInBoundingBox("WatercourseLink", mapBounds).then(
-    (watercourseLinks) => {
+  await getFeaturesInBoundingBox("WatercourseLink", mapBounds)
+    .then((watercourseLinks) => {
       map.getSource("watercourseLinks").setData(watercourseLinks);
-    }
-  );
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 };
 
 export const getWatercourseLink = async (id) => {
