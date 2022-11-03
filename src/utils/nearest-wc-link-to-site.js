@@ -22,13 +22,13 @@ const getUserAssociatedWCLink = async (siteURI) => {
     "/retrieve-user-associated-watercourse-link" +
     `?site_uri=${encodeURIComponent(siteURI)}`;
 
-  return await fetch(url, { method: "GET", headers: headers }).then((r) => {
-    if (r.status === 404) {
-      return;
-    } else {
-      return r.json();
-    }
-  });
+  const result = await fetch(url, { method: "GET", headers: headers });
+
+  if (result.status === 404) {
+    return;
+  } else {
+    return await result.json();
+  }
 };
 
 export const highlightNearestWatercourseLink = async (site, map) => {
