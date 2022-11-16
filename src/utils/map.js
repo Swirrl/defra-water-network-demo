@@ -79,7 +79,7 @@ export const setupEmptyOverlays = (map) => {
       "line-cap": "round",
     },
     paint: {
-      "line-color": "red",
+      "line-color": "#06a516",
       "line-width": 8,
     },
   });
