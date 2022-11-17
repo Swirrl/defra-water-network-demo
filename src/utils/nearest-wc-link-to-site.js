@@ -38,7 +38,7 @@ const getUserAssociatedWCLink = async (siteURI) => {
   const result = await fetch(url, { method: "GET", headers: headers });
 
   if (result.status === 404) {
-    return;
+    return null;
   } else {
     return await result.json();
   }
@@ -66,7 +66,7 @@ export const highlightNearestWatercourseLink = async (site, map) => {
 
   if (userAssociatedWCLink?.status === "No watercourse link") {
     unhighlightWatercourseLink(map);
-    return;
+    return null;
   } else if (userAssociatedWCLink) {
     wcLink = userAssociatedWCLink;
   } else {
@@ -75,4 +75,5 @@ export const highlightNearestWatercourseLink = async (site, map) => {
   }
 
   setHighlightedWcLink(map, wcLink);
+  return wcLink;
 };

@@ -6,10 +6,9 @@ import {
   saveWatercourseLinkSiteAssociation,
   getURL,
   waterNetworkAPIBase,
-  displayWaterNetworkFeaturesInMapViewport,
+  mergeFeatures,
 } from "../utils/water-network-data";
-import { displayMonitoringSitesFeaturesInMapViewport } from "../utils/monitoring-sites-data";
-import { bboxPolygon, clearUpstreamDownstream, getMapBoundingBox } from "./map";
+import { bboxPolygon, getMapBoundingBox } from "./map";
 
 const getLastURLSegment = (url) => {
   return url.split("/").pop();
@@ -83,53 +82,69 @@ const fitMapToFeatures = (map, features) => {
     }
   });
 
-  map.fitBounds(bounds, { padding: 50 });
+  map.fitBounds(bounds, { padding: 20 });
 };
 
 const getUpstream = async (id) => {
-  const url = `${waterNetworkAPIBase}/collections/WatercourseLink/items/${id}/upstream?limit=10`;
+  const url = `${waterNetworkAPIBase}/collections/WatercourseLink/items/${id}/upstream`;
   return await getURL(url);
 };
 // TODO: catch 404s
 const highlightUpstreamWatercourseLinks = async (id, map) => {
-  const upstreamWcLinks = await getUpstream(id);
-  clearUpstreamDownstream(map);
-  closePopup();
+  await getUpstream(id).then(async (upstreamWatercourseLinks) => {
+    closePopup();
+    const renderedWcLinks = map.querySourceFeatures("watercourseLinks");
+    const renderedHNs = map.querySourceFeatures("hydroNodes");
 
-  map.getSource("upstreamWatercourseLinks").setData(upstreamWcLinks);
-  fitMapToFeatures(map, upstreamWcLinks.features);
+    const allWcLinks = mergeFeatures(upstreamWatercourseLinks, renderedWcLinks);
 
-  await map.once("idle");
+    map.getSource("watercourseLinks").setData(allWcLinks);
+    map.getSource("hydroNodes").setData({
+      type: "FeatureCollection",
+      features: [...renderedHNs],
+    });
+    map.getSource("upstreamWatercourseLinks").setData(upstreamWatercourseLinks);
 
-  await displayWaterNetworkFeaturesInMapViewport(map);
-  await displayMonitoringSitesFeaturesInMapViewport(map);
+    fitMapToFeatures(map, allWcLinks.features);
+    await map.once("idle");
 
-  const mapBounds = getMapBoundingBox(map);
-  const box = bboxPolygon(mapBounds);
-  map.getSource("bbox").setData(box);
+    const mapBounds = getMapBoundingBox(map);
+    const box = bboxPolygon(mapBounds);
+    map.getSource("bbox").setData(box);
+  });
 };
 
 const getDownstream = async (id) => {
-  const url = `${waterNetworkAPIBase}/collections/WatercourseLink/items/${id}/downstream?limit=10`;
+  const url = `${waterNetworkAPIBase}/collections/WatercourseLink/items/${id}/downstream`;
   return await getURL(url);
 };
 
 const highlightDownstreamWatercourseLinks = async (id, map) => {
-  const downstreamWcLinks = await getDownstream(id);
-  closePopup();
-  clearUpstreamDownstream(map);
+  await getDownstream(id).then(async (downstreamWatercourseLinks) => {
+    closePopup();
+    const renderedWcLinks = map.querySourceFeatures("watercourseLinks");
+    const renderedHNs = map.querySourceFeatures("hydroNodes");
+    const allWcLinks = mergeFeatures(
+      downstreamWatercourseLinks,
+      renderedWcLinks
+    );
 
-  map.getSource("downstreamWatercourseLinks").setData(downstreamWcLinks);
-  fitMapToFeatures(map, downstreamWcLinks.features);
+    map.getSource("watercourseLinks").setData(allWcLinks);
+    map.getSource("hydroNodes").setData({
+      type: "FeatureCollection",
+      features: [...renderedHNs],
+    });
+    map
+      .getSource("downstreamWatercourseLinks")
+      .setData(downstreamWatercourseLinks);
 
-  await map.once("idle");
+    fitMapToFeatures(map, allWcLinks.features);
+    await map.once("idle");
 
-  await displayWaterNetworkFeaturesInMapViewport(map);
-  await displayMonitoringSitesFeaturesInMapViewport(map);
-
-  const mapBounds = getMapBoundingBox(map);
-  const box = bboxPolygon(mapBounds);
-  map.getSource("bbox").setData(box);
+    const mapBounds = getMapBoundingBox(map);
+    const box = bboxPolygon(mapBounds);
+    map.getSource("bbox").setData(box);
+  });
 };
 
 window.WCLinkSelectMode = null;
@@ -192,7 +207,7 @@ const watercourseLinkPropertiesToHTML = ({ properties }) => {
   return wcLinkPopupHTML("Watercourse Link", displayProps);
 };
 
-const sitePropertiesToHTML = ({ properties, source }) => {
+const sitePropertiesToHTML = ({ properties, source, nearestWcLink }) => {
   let url;
   let ecologyEndpoint = "https://environment.data.gov.uk/ecology/api/v1/sites/";
 
@@ -210,6 +225,12 @@ const sitePropertiesToHTML = ({ properties, source }) => {
 
   if (properties.flow) {
     displayProps["Latest complete flow reading"] = properties.flow;
+  }
+
+  if (properties.nearestWcLink) {
+    displayProps[
+      "Nearest watercourse link"
+    ] = `${nearestWcLink.properties.id} - ${nearestWcLink.distanceFromSearchPoint}m`;
   }
 
   return sitePopupHTML("Monitoring Site", displayProps, url);
@@ -402,10 +423,12 @@ export const setupLayerPopups = (map, setMapContext) => {
 
       const coords = getCoords(e);
       const site = e.features[0];
+
+      const nearestWcLink = await highlightNearestWatercourseLink(site, map);
+      site.nearestWcLink = nearestWcLink;
       const text = sitePropertiesToHTML(site);
 
       newPopup(coords, text, map, setMapContext);
-      await highlightNearestWatercourseLink(site, map);
     });
   }
 
