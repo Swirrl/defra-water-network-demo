@@ -371,7 +371,11 @@ export const setupLayerPopups = (map, setMapContext) => {
       `${properties.apiUrl}&refine.datetime=${properties.latestRecordDate}`
     ).then((response) => response.json());
 
-    site.properties.record = response.records[0].fields;
+    // Some sites (possible legacy ones) have readings
+    // taken at the same time spread out over multiple records
+    const fields = response.records.map((record) => record.fields);
+    const combinedFields = fields.reduce((acc, cur) => ({ ...acc, ...cur }));
+    site.properties.record = combinedFields;
 
     // Workaround since Bristol sites don't have a URI like EA sites
     // so we use the site's api url as an identifier
