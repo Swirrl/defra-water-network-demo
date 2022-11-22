@@ -9,20 +9,17 @@ import {
   mergeFeatures,
 } from "../utils/water-network-data";
 import { bboxPolygon, getMapBoundingBox } from "./map";
+import {
+  tableHeader,
+  tableCell,
+  toTableCells,
+  tableHTML,
+  button,
+  link,
+} from "./html-strings.js";
 
 const getLastURLSegment = (url) => {
   return url.split("/").pop();
-};
-
-const toTableCells = (displayProps) => {
-  return Object.entries(displayProps)
-    .map(([key, value]) => {
-      return `<tr>
-       <th style="vertical-align: top">${key}</th>
-       <td>${value}</td>
-     </tr>`;
-    })
-    .join("");
 };
 
 const basicPopupTableHTML = (title, displayProps) => {
@@ -38,6 +35,9 @@ const basicPopupTableHTML = (title, displayProps) => {
         ${toTableCells(displayProps)}
     </table>
   </div>`;
+
+  TODO: move the above scroll improvements into tableHTML
+  return tableHTML(title, toTableCells(displayProps));
 };
 
 const closePopup = () => {
@@ -48,21 +48,18 @@ const closePopup = () => {
 };
 
 const wcLinkPopupHTML = (title, displayProps) => {
-  const upstreamWCLinks = `<button class="govuk-button btn-sm mt-3"
-                                   id="upstream-button"
-                                   style="font-size:0.9rem; margin:0"
-                                   data-wc-link-id="${displayProps.ID}"
-                           >Show upstream watercourse links</button>`;
-
-  const downstreamWCLinks = `<button class="govuk-button btn-sm mt-3"
-                           id="downstream-button"
-                           style="font-size:0.9rem; margin:0"
-                           data-wc-link-id="${displayProps.ID}"
-                   >Show downstream watercourse links</button>`;
+  const upstreamWCLinkButton = button(
+    `data-wc-link-id="${displayProps.ID}" id="upstream-button"`,
+    "Show upstream watercourse links"
+  );
+  const downstreamWCLinkButton = button(
+    `data-wc-link-id="${displayProps.ID}" id="downstream-button"`,
+    "Show downstream watercourse links"
+  );
 
   return `${basicPopupTableHTML(title, displayProps)}
-          ${upstreamWCLinks}
-          ${downstreamWCLinks}`;
+          ${upstreamWCLinkButton}
+          ${downstreamWCLinkButton}`;
 };
 
 const fitMapToFeatures = (map, features) => {
@@ -159,15 +156,40 @@ const enableAssociateWatercourseLinkMode = (siteURI, setMapContext) => {
   setWCLinkSelectMode(siteURI, setMapContext);
 };
 
-const sitePopupHTML = (title, displayProps, url) => {
-  const rawAPILink = `<a target="_blank" href=${url}>Site API endpoint</a>`;
-  const associateWCLink = `<button class="govuk-button btn-sm mt-3"
-                                   id="associate-wc-link-button"
-                                   style="font-size:0.9rem"
-                                   data-site-uri="${displayProps.URI || url}"
-                           >Associate watercourse link</button>`;
+const nearbyWCLinkTableHTML = (nearestLinksResponse) => {
+  if (nearestLinksResponse) {
+    const props = {};
+    nearestLinksResponse.wcLinks.map((link) => {
+      props[link.properties.id] = `${link.distanceFromSearchPoint}m`;
+    });
+
+    const heading = `<tr>${tableHeader("Watercourse Link ID")}${tableHeader(
+      "Distance"
+    )}`;
+    const rows = Object.entries(props)
+      .map(([key, value]) => {
+        return ` <tr>
+${tableCell(key)}
+${tableCell(value)}
+     </tr>`;
+      })
+      .join("");
+
+    return tableHTML("Nearest Watercourse Links", [heading, rows].join(""));
+  } else {
+    return "";
+  }
+};
+
+const sitePopupHTML = (title, displayProps, url, nearestLinksResponse) => {
+  const rawAPILink = link(url, "Site API endpoint");
+  const associateWCLink = button(
+    `data-site-uri="${displayProps.URI || url}" id="associate-wc-link-button"`,
+    "Associate watercourse link"
+  );
 
   return `${basicPopupTableHTML(title, displayProps)}
+          ${nearbyWCLinkTableHTML(nearestLinksResponse)}
           ${rawAPILink}
           ${associateWCLink}`;
 };
@@ -207,7 +229,7 @@ const watercourseLinkPropertiesToHTML = ({ properties }) => {
   return wcLinkPopupHTML("Watercourse Link", displayProps);
 };
 
-const sitePropertiesToHTML = ({ properties, source, nearestWcLink }) => {
+const sitePropertiesToHTML = ({ properties, source, nearestLinksResponse }) => {
   let url;
   let ecologyEndpoint = "https://environment.data.gov.uk/ecology/api/v1/sites/";
 
@@ -227,13 +249,12 @@ const sitePropertiesToHTML = ({ properties, source, nearestWcLink }) => {
     displayProps["Latest complete flow reading"] = properties.flow;
   }
 
-  if (properties.nearestWcLink) {
-    displayProps[
-      "Nearest watercourse link"
-    ] = `${nearestWcLink.properties.id} - ${nearestWcLink.distanceFromSearchPoint}m`;
-  }
-
-  return sitePopupHTML("Monitoring Site", displayProps, url);
+  return sitePopupHTML(
+    "Monitoring Site",
+    displayProps,
+    url,
+    nearestLinksResponse
+  );
 };
 
 const bristolSitePropertiesToHTML = ({ properties }) => {
@@ -365,22 +386,6 @@ export const setupLayerPopups = (map, setMapContext) => {
     newPopup(coords, text, map, setMapContext);
   });
 
-  map.on("click", "riverFlowSites", async (e) => {
-    if (e.originalEvent.defaultPrevented) return;
-    e.originalEvent.preventDefault();
-    const coords = getCoords(e);
-    const site = e.features[0];
-
-    const siteEndpoint = ensureHttps(site.properties.uri);
-    const flow = await getLatestFlowReadingInfo(siteEndpoint);
-
-    site.properties.flow = flow;
-    const text = sitePropertiesToHTML(site);
-
-    newPopup(coords, text, map, setMapContext);
-    await highlightNearestWatercourseLink(site, map);
-  });
-
   map.on("click", "bristolWaterQualitySites", async (e) => {
     if (e.originalEvent.defaultPrevented) return;
     e.originalEvent.preventDefault();
@@ -413,6 +418,7 @@ export const setupLayerPopups = (map, setMapContext) => {
     "waterQualitySites",
     "riverLevelSites",
     "freshwaterSites",
+    "riverFlowSites",
   ]) {
     map.on("click", layer, async (e) => {
       // don't open popups in select mode
@@ -424,8 +430,17 @@ export const setupLayerPopups = (map, setMapContext) => {
       const coords = getCoords(e);
       const site = e.features[0];
 
-      const nearestWcLink = await highlightNearestWatercourseLink(site, map);
-      site.nearestWcLink = nearestWcLink;
+      if (layer === "riverFlowSites") {
+        const siteEndpoint = ensureHttps(site.properties.uri);
+        const flow = await getLatestFlowReadingInfo(siteEndpoint);
+        site.properties.flow = flow;
+      }
+
+      const nearestLinksResponse = await highlightNearestWatercourseLink(
+        site,
+        map
+      );
+      site.nearestLinksResponse = nearestLinksResponse;
       const text = sitePropertiesToHTML(site);
 
       newPopup(coords, text, map, setMapContext);
