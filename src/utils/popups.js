@@ -1,7 +1,7 @@
 import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-loader-syntax
 
 import { highlightNearestWatercourseLink } from "../utils/nearest-wc-link-to-site";
-import { ensureHttps } from "./misc";
+import { bristolFieldLabels, ensureHttps } from "./misc";
 import {
   saveWatercourseLinkSiteAssociation,
   getURL,
@@ -27,10 +27,18 @@ const toTableCells = (displayProps) => {
 };
 
 const basicPopupTableHTML = (title, displayProps) => {
-  return `<table>
-       <caption style="font-weight: bold; caption-side: top">${title}</caption>
+  let scrollCss = "";
+  if (Object.keys(displayProps).length > 5) {
+    scrollCss = `style="height: 20rem; overflow: auto; scrollbar-width: thin; padding-bottom: 5px;"`;
+  }
+
+  return `
+  <div ${scrollCss}>
+    <table>
+      <caption style="font-weight: bold; caption-side: top">${title}</caption>
         ${toTableCells(displayProps)}
-     </table>`;
+    </table>
+  </div>`;
 };
 
 const closePopup = () => {
@@ -141,7 +149,7 @@ const sitePopupHTML = (title, displayProps, url) => {
   const associateWCLink = `<button class="govuk-button btn-sm mt-3"
                                    id="associate-wc-link-button"
                                    style="font-size:0.9rem"
-                                   data-site-uri="${displayProps.URI}"
+                                   data-site-uri="${displayProps.URI || url}"
                            >Associate watercourse link</button>`;
 
   return `${basicPopupTableHTML(title, displayProps)}
@@ -205,6 +213,24 @@ const sitePropertiesToHTML = ({ properties, source }) => {
   }
 
   return sitePopupHTML("Monitoring Site", displayProps, url);
+};
+
+const bristolSitePropertiesToHTML = ({ properties }) => {
+  const latestRecordDateTime = new Date(properties.record.datetime);
+
+  const displayProps = {
+    Name: properties.label,
+    "Site Id": properties.siteId,
+    "Latest record datetime": `${latestRecordDateTime.toLocaleDateString()} ${latestRecordDateTime.toLocaleTimeString()}`,
+  };
+
+  for (const [reading, value] of Object.entries(properties.record)) {
+    if (bristolFieldLabels[reading]) {
+      displayProps[bristolFieldLabels[reading]] = value;
+    }
+  }
+
+  return sitePopupHTML("Monitoring Site", displayProps, properties.apiUrl);
 };
 
 const getCoords = (event) => {
@@ -334,6 +360,29 @@ export const setupLayerPopups = (map, setMapContext) => {
     await highlightNearestWatercourseLink(site, map);
   });
 
+  map.on("click", "bristolWaterQualitySites", async (e) => {
+    if (e.originalEvent.defaultPrevented) return;
+    e.originalEvent.preventDefault();
+    const coords = getCoords(e);
+    const site = e.features[0];
+
+    const properties = site.properties;
+    const response = await fetch(
+      `${properties.apiUrl}&refine.datetime=${properties.latestRecordDate}`
+    ).then((response) => response.json());
+
+    site.properties.record = response.records[0].fields;
+
+    // Workaround since Bristol sites don't have a URI like EA sites
+    // so we use the site's api url as an identifier
+    // for highlighting and assocating nearest wclink
+    site.properties.uri = site.properties.apiUrl;
+
+    const text = bristolSitePropertiesToHTML(site);
+    newPopup(coords, text, map, setMapContext);
+    await highlightNearestWatercourseLink(site, map);
+  });
+
   for (const layer of [
     "biosysSites",
     "waterQualitySites",
@@ -362,6 +411,7 @@ export const setupLayerPopups = (map, setMapContext) => {
     "riverLevelSites",
     "riverFlowSites",
     "freshwaterSites",
+    "bristolWaterQualitySites",
     "hydroNodes",
     "watercourseLinks",
   ]) {

@@ -6,6 +6,17 @@ export const getMapBoundingBox = (map) => {
   return [_sw.lng, _sw.lat, _ne.lng, _ne.lat];
 };
 
+export const getBboxCorners = (map) => {
+  const { _sw, _ne } = map.getBounds();
+
+  return {
+    sw: { lng: _sw.lng, lat: _sw.lat },
+    nw: { lng: _sw.lng, lat: _ne.lat },
+    ne: { lng: _ne.lng, lat: _ne.lat },
+    se: { lng: _ne.lng, lat: _sw.lat },
+  };
+};
+
 const addGeoJSONSource = (map, name) => {
   map.addSource(name, {
     type: "geojson",
@@ -200,6 +211,17 @@ export const setupEmptyOverlays = (map) => {
       "circle-radius": 8,
     },
   });
+
+  addGeoJSONSource(map, "bristolWaterQualitySites");
+  map.addLayer({
+    id: "bristolWaterQualitySites",
+    type: "circle",
+    source: "bristolWaterQualitySites",
+    paint: {
+      "circle-color": "yellow",
+      "circle-radius": 8,
+    },
+  });
 };
 
 export const bboxPolygon = ([swLng, swLat, neLng, neLat]) => {
@@ -236,4 +258,3 @@ export const clearUpstreamDownstream = (map) => {
     features: [],
   });
 };
-

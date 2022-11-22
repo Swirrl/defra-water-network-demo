@@ -55,6 +55,7 @@ td {
 .mapboxgl-popup-content {
   font-size: 14px;
   padding: 20px;
+  padding-top: 25px;
 }
 
 .mapboxgl-popup-content table {
@@ -99,6 +100,6 @@ td {
 .mapboxgl-popup-close-button {
   font-size: 24px;
   display: block;
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
 }

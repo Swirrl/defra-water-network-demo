@@ -48,6 +48,11 @@
   border-color: #720e93;
 }
 
+#bristolWaterQualitySites:checked {
+  background-color: yellow;
+  border-color: yellow;
+}
+
 #hydroNodes:checked {
   background-color: #004e7f;
   border-color: #004e7f;
