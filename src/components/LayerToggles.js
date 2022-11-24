@@ -12,6 +12,8 @@ function LayerToggles({ map }) {
   const [riverLevelChecked, setRiverLevelChecked] = useState(true);
   const [riverFlowChecked, setRiverFlowChecked] = useState(true);
   const [freshwaterChecked, setFreshwaterChecked] = useState(true);
+  const [bristolWaterQualityChecked, setBristolWaterQualityChecked] =
+    useState(true);
   const [hydroNodesChecked, setHydroNodes] = useState(true);
   const [watercourseLinksChecked, setWatercourseLinks] = useState(true);
 
@@ -30,6 +32,7 @@ function LayerToggles({ map }) {
     riverLevelSites: setRiverLevelChecked,
     riverFlowSites: setRiverFlowChecked,
     freshwaterSites: setFreshwaterChecked,
+    bristolWaterQualitySites: setBristolWaterQualityChecked,
     hydroNodes: setHydroNodes,
     watercourseLinks: setWatercourseLinks,
   };
@@ -93,6 +96,12 @@ function LayerToggles({ map }) {
             id="freshwaterSites"
             onChange={toggleLayer}
             checked={freshwaterChecked}
+          />
+          <Form.Switch
+            label="Bristol Surface Water Quality Sites"
+            id="bristolWaterQualitySites"
+            onChange={toggleLayer}
+            checked={bristolWaterQualityChecked}
           />
         </Form>
         <Button

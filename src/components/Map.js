@@ -20,8 +20,8 @@ export const MapContext = React.createContext(null);
 function Map() {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [lng, setLng] = useState(-2.25);
-  const [lat, setLat] = useState(53.48);
+  const [lng, setLng] = useState(-2.6);
+  const [lat, setLat] = useState(51.45);
   const [zoom, setZoom] = useState(9);
   const [showSearch, setShowSearch] = useState(false);
   const [searchError, setSearchError] = useState(null);
