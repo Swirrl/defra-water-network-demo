@@ -133,41 +133,48 @@ const setRiverFlowSitesInBoundingBox = async (map, corners) => {
 const setBristolWaterQualitySitesInBoundingBox = async (map) => {
   const query = bristolWaterQualityQuery(map);
   const response = await fetch(query).then((response) => response.json());
-  const records = response.records;
-  const siteIds = response.facet_groups[0].facets.map((facet) => facet.name);
 
-  const latestRecords = [];
-  for (const siteId of siteIds) {
-    let latestRecord = records.find(
-      (record) => record.fields.siteid === siteId
-    );
+  // Ensure there are sites in bbox before continuing
+  if (response.facet_groups) {
+    const records = response.records;
+    const siteIds = response.facet_groups[0].facets.map((facet) => facet.name);
 
-    if (latestRecord) {
-      latestRecords.push(latestRecord);
-    } else {
-      const recordsForSiteQuery = getRecordsForBWQSiteQuery(siteId);
-      const response = await fetch(recordsForSiteQuery).then((response) =>
-        response.json()
+    const latestRecords = [];
+    for (const siteId of siteIds) {
+      let latestRecord = records.find(
+        (record) => record.fields.siteid === siteId
       );
-      const record = response.records[0];
-      latestRecords.push(record);
+
+      if (latestRecord) {
+        latestRecords.push(latestRecord);
+      } else {
+        // If the initial response doesn't contain a record for a siteId
+        // (we order records by datetime and the site might only have old records)
+        // here we get the latest record for that site (which includes the site's geometry)
+        const recordsForSiteQuery = getRecordsForBWQSiteQuery(siteId);
+        const response = await fetch(recordsForSiteQuery).then((response) =>
+          response.json()
+        );
+        const record = response.records[0];
+        latestRecords.push(record);
+      }
     }
+
+    const bristolSites = {
+      type: "FeatureCollection",
+      features: latestRecords.map((record) => ({
+        geometry: record.geometry,
+        properties: {
+          label: record.fields.sitename,
+          siteId: record.fields.siteid,
+          apiUrl: getRecordsForBWQSiteQuery(record.fields.siteid),
+          latestRecordDate: record.fields.datetime.split("T")[0],
+        },
+      })),
+    };
+
+    map.getSource("bristolWaterQualitySites").setData(bristolSites);
   }
-
-  const bristolSites = {
-    type: "FeatureCollection",
-    features: latestRecords.map((record) => ({
-      geometry: record.geometry,
-      properties: {
-        label: record.fields.sitename,
-        siteId: record.fields.siteid,
-        apiUrl: getRecordsForBWQSiteQuery(record.fields.siteid),
-        latestRecordDate: record.fields.datetime.split("T")[0],
-      },
-    })),
-  };
-
-  map.getSource("bristolWaterQualitySites").setData(bristolSites);
 };
 
 export const displayMonitoringSitesFeaturesInMapViewport = async (map) => {
