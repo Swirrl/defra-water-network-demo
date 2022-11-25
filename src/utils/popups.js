@@ -23,20 +23,6 @@ const getLastURLSegment = (url) => {
 };
 
 const basicPopupTableHTML = (title, displayProps) => {
-  let scrollCss = "";
-  if (Object.keys(displayProps).length > 5) {
-    scrollCss = `style="height: 20rem; overflow: auto; scrollbar-width: thin; padding-bottom: 5px;"`;
-  }
-
-  return `
-  <div ${scrollCss}>
-    <table>
-      <caption style="font-weight: bold; caption-side: top">${title}</caption>
-        ${toTableCells(displayProps)}
-    </table>
-  </div>`;
-
-  TODO: move the above scroll improvements into tableHTML
   return tableHTML(title, toTableCells(displayProps));
 };
 
@@ -159,9 +145,9 @@ const enableAssociateWatercourseLinkMode = (siteURI, setMapContext) => {
 const nearbyWCLinkTableHTML = (nearestLinksResponse) => {
   if (nearestLinksResponse) {
     const props = {};
-    nearestLinksResponse.wcLinks.map((link) => {
+    for (const link of nearestLinksResponse.wcLinks) {
       props[link.properties.id] = `${link.distanceFromSearchPoint}m`;
-    });
+    }
 
     const heading = `<tr>${tableHeader("Watercourse Link ID")}${tableHeader(
       "Distance"

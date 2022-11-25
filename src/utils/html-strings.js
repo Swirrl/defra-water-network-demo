@@ -18,10 +18,17 @@ ${tableCell(value)}
 };
 
 export const tableHTML = (title, cellHTML) => {
-  return `<table style="width: 100%">
-       <caption style="font-weight: bold; caption-side: top">${title}</caption>
+  const scrollCss = `style="max-height: 20rem;
+                            overflow: auto;
+                            scrollbar-width: thin;
+                            padding-bottom: 5px;"`;
+  return `
+  <div ${scrollCss}>
+    <table>
+      <caption style="font-weight: bold; caption-side: top">${title}</caption>
         ${cellHTML}
-     </table>`;
+    </table>
+  </div>`;
 };
 
 export const button = (extraAttributes, text) => {
