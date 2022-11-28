@@ -144,24 +144,30 @@ const enableAssociateWatercourseLinkMode = (siteURI, setMapContext) => {
 
 const nearbyWCLinkTableHTML = (nearestLinksResponse) => {
   if (nearestLinksResponse) {
-    const props = {};
-    for (const link of nearestLinksResponse.wcLinks) {
-      props[link.properties.id] = `${link.distanceFromSearchPoint}m`;
-    }
+    const { wcLinks, userSelected } = nearestLinksResponse;
 
-    const heading = `<tr>${tableHeader("Watercourse Link ID")}${tableHeader(
-      "Distance"
-    )}`;
-    const rows = Object.entries(props)
-      .map(([key, value]) => {
-        return ` <tr>
+    if (wcLinks && !userSelected) {
+      const props = {};
+      for (const link of wcLinks) {
+        props[link.properties.id] = `${link.distanceFromSearchPoint}m`;
+      }
+
+      const heading = `<tr>${tableHeader("Watercourse Link ID")}${tableHeader(
+        "Distance"
+      )}`;
+      const rows = Object.entries(props)
+        .map(([key, value]) => {
+          return ` <tr>
 ${tableCell(key)}
 ${tableCell(value)}
      </tr>`;
-      })
-      .join("");
+        })
+        .join("");
 
-    return tableHTML("Nearest Watercourse Links", [heading, rows].join(""));
+      return tableHTML("Nearest Watercourse Links", [heading, rows].join(""));
+    } else {
+      return "";
+    }
   } else {
     return "";
   }
@@ -233,6 +239,11 @@ const sitePropertiesToHTML = ({ properties, source, nearestLinksResponse }) => {
 
   if (properties.flow) {
     displayProps["Latest complete flow reading"] = properties.flow;
+  }
+
+  if (nearestLinksResponse?.userSelected) {
+    displayProps["Associated Watercourse Link"] =
+      nearestLinksResponse.wcLinks[0].properties.id;
   }
 
   return sitePopupHTML(

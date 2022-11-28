@@ -24,7 +24,7 @@ export const tableHTML = (title, cellHTML) => {
                             padding-bottom: 5px;"`;
   return `
   <div ${scrollCss}>
-    <table>
+    <table style="width: 100%">
       <caption style="font-weight: bold; caption-side: top">${title}</caption>
         ${cellHTML}
     </table>

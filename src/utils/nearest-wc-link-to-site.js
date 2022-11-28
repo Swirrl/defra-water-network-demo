@@ -74,7 +74,8 @@ export const highlightNearestWatercourseLink = async (site, map) => {
     unhighlightWatercourseLink(map);
     return null;
   } else if (userAssociatedWCLink) {
-    wcLink = userAssociatedWCLink;
+    wcLink = { ...userAssociatedWCLink, certainty: "certain" };
+    allLinks = { wcLinks: [userAssociatedWCLink] };
     userSelected = true;
   } else {
     const coords = site.geometry.coordinates;
