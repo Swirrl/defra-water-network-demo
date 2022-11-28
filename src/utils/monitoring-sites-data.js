@@ -2,11 +2,10 @@ import { getBboxCorners, getMapBoundingBox } from "../utils/map";
 import { latLngToOSGrid } from "../utils/coords";
 import { csvToGeoJSON } from "../utils/geojson";
 
-const requestURL = (query) => {
-  return (
+const requestURL = (queryTemplate) => {
+  return (corners) =>
     `https://environment-test.data.gov.uk/` +
-    `linked-data/sparql?query=${encodeURIComponent(query)}`
-  );
+    `linked-data/sparql?query=${encodeURIComponent(queryTemplate(corners))}`;
 };
 
 const bboxFilter = ([swEasting, swNorthing], [neEasting, neNorthing]) => {
@@ -54,7 +53,7 @@ const riverLevelSitesQuery = ([sw, ne]) => {
   );
 };
 
-const riverFlowSitesQuery = ([
+const riverFlowSitesRequestURL = ([
   [swEasting, swNorthing],
   [neEasting, neNorthing],
 ]) => {
@@ -72,6 +71,13 @@ const fishPopulationFreshwaterSites = ([sw, ne]) => {
     bboxFilter(sw, ne) +
     `}`
   );
+};
+
+const getSitesInBoundingBox = async (url) => {
+  const response = await fetch(url);
+  const text = await response.text();
+  const csv = text.replace(/"+/g, "");
+  return csvToGeoJSON(csv);
 };
 
 const bristolBaseUrl = `https://opendata.bristol.gov.uk/api/records/1.0/search/?dataset=surface-water-quality&q=&sort=datetime`;
@@ -93,41 +99,28 @@ const getRecordsForBWQSiteQuery = (siteId) => {
   return `${bristolBaseUrl}&refine.siteid=${siteId}`;
 };
 
-const getSitesInBoundingBox = async (query) => {
-  const url = requestURL(query);
-  const csv = await fetch(url).then((response) => response.text());
-  return csvToGeoJSON(csv);
-};
-
 const mapBoundsToEastingNorthing = ([swLng, swLat, nwLng, neLat]) => {
   return [latLngToOSGrid([swLng, swLat]), latLngToOSGrid([nwLng, neLat])];
 };
 
-const queryTemplates = {
-  biosysSites: biosysSitesQuery,
-  waterQualitySites: waterQualitySitesQuery,
-  riverLevelSites: riverLevelSitesQuery,
-  freshwaterSites: fishPopulationFreshwaterSites,
+const requestURLs = {
+  biosysSites: requestURL(biosysSitesQuery),
+  waterQualitySites: requestURL(waterQualitySitesQuery),
+  riverLevelSites: requestURL(riverLevelSitesQuery),
+  freshwaterSites: requestURL(fishPopulationFreshwaterSites),
+  riverFlowSites: riverFlowSitesRequestURL,
 };
 
-const getQuery = (layer, corners) => {
-  const queryTemplate = queryTemplates[layer];
+const getRequestURL = (layer, corners) => {
+  const queryTemplate = requestURLs[layer];
   return queryTemplate(corners);
 };
 
 const setSitesInBoundingBox = async (map, corners, layer) => {
-  const query = getQuery(layer, corners);
-  return await getSitesInBoundingBox(query).then((sites) => {
+  const url = getRequestURL(layer, corners);
+  return await getSitesInBoundingBox(url).then((sites) => {
     map.getSource(layer).setData(sites);
   });
-};
-
-const setRiverFlowSitesInBoundingBox = async (map, corners) => {
-  const query = riverFlowSitesQuery(corners);
-  const csv = await fetch(query).then((response) => response.text());
-
-  const sites = csvToGeoJSON(csv.replace(/"+/g, ""));
-  map.getSource("riverFlowSites").setData(sites);
 };
 
 const setBristolWaterQualitySitesInBoundingBox = async (map) => {
@@ -185,6 +178,6 @@ export const displayMonitoringSitesFeaturesInMapViewport = async (map) => {
   await setSitesInBoundingBox(map, corners, "waterQualitySites");
   await setSitesInBoundingBox(map, corners, "riverLevelSites");
   await setSitesInBoundingBox(map, corners, "freshwaterSites");
-  await setRiverFlowSitesInBoundingBox(map, corners);
+  await setSitesInBoundingBox(map, corners, "riverFlowSites");
   await setBristolWaterQualitySitesInBoundingBox(map);
 };

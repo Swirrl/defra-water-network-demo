@@ -39,7 +39,7 @@ td {
   overflow-wrap: anywhere;
 }
 
-.mapboxgl-popup.mapboxgl-popup-anchor-bottom {
+.mapboxgl-popup {
   max-width: 320px !important;
 }
 
