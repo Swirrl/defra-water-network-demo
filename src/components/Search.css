@@ -5,15 +5,298 @@
 
 .Search-results-list-item button {
   text-align: left;
+  color: #1d70b8;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.1em;
 }
+
+.Search-results-list-item button:hover {
+  color: #003078;
+  text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+  -webkit-text-decoration-skip-ink: none;
+  text-decoration-skip-ink: none;
+  -webkit-text-decoration-skip: none;
+  text-decoration-skip: none;
+}
+
+.Search-results-list-item button:focus {
+  outline: 3px solid rgba(0, 0, 0, 0);
+  color: #0b0c0c;
+  background-color: #fd0;
+  -webkit-box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
+  box-shadow: 0 -2px #fd0, 0 4px #0b0c0c;
+  text-decoration: none;
+}
+
+/* Gov button styles */
+.govuk-button {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  font-size: 16px;
+  font-size: 1rem;
+  line-height: 1.1875;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  margin-top: 0;
+  margin-right: 0;
+  margin-left: 0;
+  margin-bottom: 22px;
+  padding: 8px 10px 7px;
+  border: 2px solid rgba(0, 0, 0, 0);
+  border-radius: 0;
+  color: #fff;
+  background-color: #00703c;
+  -webkit-box-shadow: 0 2px 0 #002d18;
+  box-shadow: 0 2px 0 #002d18;
+  text-align: center;
+  vertical-align: top;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+@media print {
+  .govuk-button {
+    font-family: sans-serif;
+  }
+}
+
+@media (min-width: 40.0625em) {
+  .govuk-button {
+    font-size: 19px;
+    font-size: 1.1875rem;
+    line-height: 1;
+  }
+}
+
+@media print {
+  .govuk-button {
+    font-size: 14pt;
+    line-height: 19px;
+  }
+}
+
+@media (min-width: 40.0625em) {
+  .govuk-button {
+    margin-bottom: 32px;
+  }
+}
+
+@media (min-width: 40.0625em) {
+  .govuk-button {
+    width: auto;
+  }
+}
+
+.govuk-button:link,
+.govuk-button:visited,
+.govuk-button:active,
+.govuk-button:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+.govuk-button::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+
+.govuk-button:hover {
+  background-color: #005a30;
+  border-color: #005a30;
+}
+
+.btn.govuk-button:first-child:hover,
+:not(.btn-check) + .btn.govuk-button:hover {
+  background-color: #005a30;
+  border-color: #005a30;
+}
+
+.govuk-button:focus {
+  border-color: #fd0;
+  outline: 3px solid rgba(0, 0, 0, 0);
+  -webkit-box-shadow: inset 0 0 0 1px #fd0;
+  box-shadow: inset 0 0 0 1px #fd0;
+}
+
+.govuk-button:focus:not(:active):not(:hover) {
+  border-color: #fd0;
+  color: #0b0c0c;
+  background-color: #fd0;
+  -webkit-box-shadow: 0 2px 0 #0b0c0c;
+  box-shadow: 0 2px 0 #0b0c0c;
+}
+
+.govuk-button:before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  bottom: -4px;
+  left: -2px;
+  background: rgba(0, 0, 0, 0);
+}
+
+.govuk-button:active:before {
+  top: -4px;
+}
+
+.govuk-button--disabled,
+.govuk-button[disabled="disabled"],
+.govuk-button[disabled] {
+  opacity: 0.5;
+  background-color: #00703c;
+  border-color: #00703c;
+}
+
+.govuk-button--disabled:hover,
+.govuk-button[disabled="disabled"]:hover,
+.govuk-button[disabled]:hover {
+  background-color: #00703c;
+  border-color: #00703c;
+  cursor: default;
+}
+
+.govuk-button--disabled:active,
+.govuk-button[disabled="disabled"]:active,
+.govuk-button[disabled]:active {
+  top: 0;
+  -webkit-box-shadow: 0 2px 0 #002d18;
+  box-shadow: 0 2px 0 #002d18;
+}
+
+.govuk-button--secondary {
+  background-color: #f3f2f1;
+  -webkit-box-shadow: 0 2px 0 #929191;
+  box-shadow: 0 2px 0 #929191;
+}
+
+.govuk-button--secondary,
+.govuk-button--secondary:link,
+.govuk-button--secondary:visited,
+.govuk-button--secondary:active,
+.govuk-button--secondary:hover {
+  color: #0b0c0c;
+}
+
+.govuk-button--secondary:hover {
+  background-color: #dbdad9;
+}
+
+.govuk-button--secondary:hover[disabled] {
+  background-color: #f3f2f1;
+}
+
+/* End gov button styles */
 
 .Search-button {
   position: absolute;
   z-index: 1;
+  width: auto;
   top: 1rem;
   left: 1rem;
 }
 
 .Search-tabs {
   margin-bottom: 1rem;
+}
+
+.nav-tabs .nav-link {
+  color: black;
+  text-decoration: underline;
+  border-radius: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.1em;
+  transition: none;
+}
+
+.nav-tabs .nav-item.show .nav-link,
+.nav-tabs .nav-link.active {
+  color: black;
+  text-decoration: none;
+}
+.nav-tabs .nav-item.show .nav-link:focus,
+.nav-tabs .nav-link.active:focus {
+  outline: 3px solid #fd0;
+  outline-offset: 0;
+  -webkit-box-shadow: inset 0 0 0 2px;
+  box-shadow: inset 0 0 0 2px;
+}
+
+.nav-tabs .nav-link:focus,
+.nav-tabs .nav-link:not(.active):hover {
+  border: none;
+  text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+  -webkit-text-decoration-skip-ink: none;
+  text-decoration-skip-ink: none;
+  -webkit-text-decoration-skip: none;
+  text-decoration-skip: none;
+}
+
+/* Cant hook into text input to add classname so overriding rather than addin gov class */
+
+.form-control {
+  font-family: "GDS Transport", arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  font-size: 16px;
+  font-size: 1rem;
+  line-height: 1.25;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  height: 40px;
+  height: 2.5rem;
+  margin-top: 0;
+  padding: 5px;
+  border: 2px solid #0b0c0c;
+  border-radius: 0;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+@media print {
+  .form-control {
+    font-family: sans-serif;
+  }
+}
+
+@media (min-width: 40.0625em) {
+  .form-control {
+    font-size: 19px;
+    font-size: 1.1875rem;
+    line-height: 1.3157894737;
+  }
+}
+
+.form-control:focus {
+  outline: 3px solid #fd0;
+  outline-offset: 0;
+  -webkit-box-shadow: inset 0 0 0 2px;
+  box-shadow: inset 0 0 0 2px;
+}
+
+.form-control::-webkit-outer-spin-button,
+.govuk-input::-webkit-inner-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.offcanvas-header .btn-close:focus {
+  outline: 3px solid #fd0;
+  outline-offset: 0;
+  -webkit-box-shadow: inset 0 0 0 2px;
+  box-shadow: inset 0 0 0 2px;
 }

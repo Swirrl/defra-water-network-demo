@@ -9,7 +9,10 @@ import { debounce } from "../utils/misc";
 
 import "./SearchHereButton.css";
 import { useNavigate } from "react-router-dom";
-import { unhighlightWatercourseLink } from "../utils/nearest-wc-link-to-site";
+import {
+  clearUpstreamDownstream,
+  unhighlightWatercourseLink,
+} from "../utils/map";
 
 function SearchHereButton({ map }) {
   const navigate = useNavigate();
@@ -17,6 +20,7 @@ function SearchHereButton({ map }) {
   const renderMapItems = async () => {
     navigate("/");
     unhighlightWatercourseLink(map.current);
+    clearUpstreamDownstream(map.current);
     await displayWaterNetworkFeaturesInMapViewport(map.current);
     await displayMonitoringSitesFeaturesInMapViewport(map.current);
   };
@@ -51,7 +55,11 @@ function SearchHereButton({ map }) {
       onClick={renderMapItems}
       disabled={isDisabled}
       variant="secondary"
-      className={isDisabled ? "" : "SearchHereButton"}
+      className={
+        isDisabled
+          ? "govuk-button govuk-button--secondary"
+          : "SearchHereButton govuk-button govuk-button--secondary"
+      }
     >
       Search Here
     </Button>

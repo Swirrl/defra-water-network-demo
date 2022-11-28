@@ -10,7 +10,10 @@ function LayerToggles({ map }) {
   const [biosysChecked, setBiosysChecked] = useState(true);
   const [waterQualityChecked, setWaterQualityChecked] = useState(true);
   const [riverLevelChecked, setRiverLevelChecked] = useState(true);
+  const [riverFlowChecked, setRiverFlowChecked] = useState(true);
   const [freshwaterChecked, setFreshwaterChecked] = useState(true);
+  const [bristolWaterQualityChecked, setBristolWaterQualityChecked] =
+    useState(true);
   const [hydroNodesChecked, setHydroNodes] = useState(true);
   const [watercourseLinksChecked, setWatercourseLinks] = useState(true);
 
@@ -27,7 +30,9 @@ function LayerToggles({ map }) {
     biosysSites: setBiosysChecked,
     waterQualitySites: setWaterQualityChecked,
     riverLevelSites: setRiverLevelChecked,
+    riverFlowSites: setRiverFlowChecked,
     freshwaterSites: setFreshwaterChecked,
+    bristolWaterQualitySites: setBristolWaterQualityChecked,
     hydroNodes: setHydroNodes,
     watercourseLinks: setWatercourseLinks,
   };
@@ -81,10 +86,22 @@ function LayerToggles({ map }) {
             checked={riverLevelChecked}
           />
           <Form.Switch
+            label="River Flow Sites"
+            id="riverFlowSites"
+            onChange={toggleLayer}
+            checked={riverFlowChecked}
+          />
+          <Form.Switch
             label="Fish Population Freshwater Sites"
             id="freshwaterSites"
             onChange={toggleLayer}
             checked={freshwaterChecked}
+          />
+          <Form.Switch
+            label="Bristol Surface Water Quality Sites"
+            id="bristolWaterQualitySites"
+            onChange={toggleLayer}
+            checked={bristolWaterQualityChecked}
           />
         </Form>
         <Button

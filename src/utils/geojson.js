@@ -17,7 +17,7 @@ const toFeature = (row) => {
 
 const toFeatures = (csv) =>
   csv
-    .split("\r\n")
+    .split(/\r?\n/)
     .slice(1)
     .filter((row) => row.length > 0)
     .map(toFeature);

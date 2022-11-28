@@ -3,6 +3,7 @@ import mapboxgl from "!mapbox-gl"; // eslint-disable-line import/no-webpack-load
 
 import Search from "./Search";
 import SearchHereButton from "./SearchHereButton";
+import NoWatercourseLinkButton from "./NoWatercourseLinkButton";
 import LayerToggles from "./LayerToggles";
 
 import "./Map.css";
@@ -14,14 +15,17 @@ import { showWatercourseLink } from "../utils/wc-link-from-id";
 
 mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN;
 
+export const MapContext = React.createContext(null);
+
 function Map() {
   const mapContainer = useRef(null);
   const map = useRef(null);
-  const [lng, setLng] = useState(-2.25);
-  const [lat, setLat] = useState(53.48);
+  const [lng, setLng] = useState(-2.6);
+  const [lat, setLat] = useState(51.45);
   const [zoom, setZoom] = useState(9);
   const [showSearch, setShowSearch] = useState(false);
   const [searchError, setSearchError] = useState(null);
+  const [showNoWCLinkButton, setShowNoWCLinkButton] = useState(null);
 
   const OSapiKey = process.env.REACT_APP_OS_API_KEY;
   const OSserviceUrl = "https://api.os.uk/maps/raster/v1/zxy";
@@ -78,7 +82,7 @@ function Map() {
       );
 
       setupEmptyOverlays(map.current);
-      setupLayerPopups(map.current);
+      setupLayerPopups(map.current, setShowNoWCLinkButton);
     });
   });
 
@@ -94,7 +98,7 @@ function Map() {
   useEffect(() => {
     if (!map.current) return; // wait for map to initialize
 
-    map.current.once("idle", () => {
+    map.current.once("load", () => {
       if (watercourseLinkId) {
         setShowSearch(false);
         showWatercourseLink(watercourseLinkId, map).catch((error) => {
@@ -105,15 +109,19 @@ function Map() {
         setShowSearch(true);
       }
     });
-  }, []);
+  });
 
   return (
-    <>
+    <MapContext.Provider value={showNoWCLinkButton}>
       <Search map={map} initialShow={showSearch} initialError={searchError} />
       <SearchHereButton map={map} />
+      <NoWatercourseLinkButton
+        map={map}
+        setMapContext={setShowNoWCLinkButton}
+      />
       <LayerToggles map={map} />
       <div ref={mapContainer} className="Map-container" />
-    </>
+    </MapContext.Provider>
   );
 }
 

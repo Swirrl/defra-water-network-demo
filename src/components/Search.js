@@ -12,7 +12,10 @@ import { OSGridToLatLng } from "../utils/coords";
 
 import "./Search.css";
 import { useNavigate } from "react-router-dom";
-import { unhighlightWatercourseLink } from "../utils/nearest-wc-link-to-site";
+import {
+  clearUpstreamDownstream,
+  unhighlightWatercourseLink,
+} from "../utils/map";
 import { showWatercourseLink } from "../utils/wc-link-from-id";
 
 function Search({ map, initialShow, initialError }) {
@@ -71,6 +74,7 @@ function Search({ map, initialShow, initialError }) {
     setResults([]);
     navigate("/");
     unhighlightWatercourseLink(map.current);
+    clearUpstreamDownstream(map.current);
     await displayWaterNetworkFeaturesInMapViewport(map.current);
     await displayMonitoringSitesFeaturesInMapViewport(map.current);
   };
@@ -111,8 +115,12 @@ function Search({ map, initialShow, initialError }) {
 
   return (
     <>
-      <Button variant="primary" onClick={handleShow} className="Search-button">
-        Search ▶
+      <Button
+        variant="primary"
+        onClick={handleShow}
+        className="Search-button govuk-button"
+      >
+        Search
       </Button>
       <Offcanvas show={show} onHide={handleClose}>
         <Offcanvas.Header closeButton>
@@ -140,6 +148,7 @@ function Search({ map, initialShow, initialError }) {
                   variant="primary"
                   type="submit"
                   disabled={query ? false : true}
+                  className="govuk-button"
                 >
                   Submit
                 </Button>
@@ -166,6 +175,7 @@ function Search({ map, initialShow, initialError }) {
                   variant="primary"
                   type="submit"
                   disabled={query ? false : true}
+                  className="govuk-button"
                 >
                   Submit
                 </Button>

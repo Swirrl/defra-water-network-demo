@@ -1,5 +1,48 @@
+/* Gov button styles */
+.govuk-button--secondary {
+  background-color: #f3f2f1;
+  -webkit-box-shadow: 0 2px 0 #929191;
+  box-shadow: 0 2px 0 #929191;
+}
+
+.govuk-button--secondary,
+.govuk-button--secondary:link,
+.govuk-button--secondary:visited,
+.govuk-button--secondary:active,
+.govuk-button--secondary:hover {
+  color: #0b0c0c;
+}
+
+.govuk-button--secondary:hover {
+  background-color: #dbdad9;
+  border-color: #dbdad9;
+  color: #0b0c0c;
+}
+
+.btn.govuk-button.govuk-button--secondary:first-child:hover,
+:not(.btn-check) + .btn.govuk-button.govuk-button--secondary:hover {
+  background-color: #dbdad9;
+  border-color: #dbdad9;
+  color: #0b0c0c;
+}
+
+.govuk-button--secondary:hover[disabled] {
+  background-color: #f3f2f1;
+  border-color: #f3f2f1;
+}
+.govuk-button--secondary.govuk-button--disabled,
+.govuk-button--secondary.govuk-button[disabled="disabled"],
+.govuk-button--secondary.govuk-button[disabled] {
+  opacity: 0.4;
+  background-color: black;
+  border-color: black;
+}
+
+/* End gov button styles */
+
 .SearchHereButton-tooltip-overlay,
 .SearchHereButton {
+  margin-bottom: 0;
   position: absolute;
   z-index: 1;
   top: 4rem;
