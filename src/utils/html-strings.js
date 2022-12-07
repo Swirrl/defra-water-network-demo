@@ -38,6 +38,6 @@ export const button = (extraAttributes, text) => {
                            >${text}</button>`;
 };
 
-export const link = (url, text) => {
-  return `<a target="_blank" href=${url}>${text}</a>`;
+export const link = (url, text, style = "") => {
+  return `<a target="_blank" style="${style}" href=${url}>${text}</a>`;
 };

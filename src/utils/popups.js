@@ -26,6 +26,54 @@ const basicPopupTableHTML = (title, displayProps) => {
   return tableHTML(title, toTableCells(displayProps));
 };
 
+const hydroNodeCatchmentsLinks = (properties) => {
+  const catchmentLinks = [];
+  if (properties.riverCatchment) {
+    catchmentLinks.push({
+      text: "EA River Catchment",
+      url:
+        "https://environment.data.gov.uk/catchment-planning/WaterBody/" +
+        properties.riverCatchment,
+      style: "display:block;",
+    });
+  }
+
+  if (properties.operationalCatchment) {
+    catchmentLinks.push({
+      text: "EA Operational Catchment",
+      url:
+        "https://environment.data.gov.uk/catchment-planning/OperationalCatchment/" +
+        properties.operationalCatchment,
+      style: "display:block;",
+    });
+  }
+
+  if (properties.managementCatchment) {
+    catchmentLinks.push({
+      text: "EA Management Catchment",
+      url:
+        "https://environment.data.gov.uk/catchment-planning/ManagementCatchment/" +
+        properties.managementCatchment,
+      style: "display:block;",
+    });
+  }
+
+  if (properties.riverBasinDistrict) {
+    catchmentLinks.push({
+      text: "EA River Basin District",
+      url:
+        "https://environment.data.gov.uk/catchment-planning/RiverBasinDistrict/" +
+        properties.riverBasinDistrict,
+      style: "display:block;",
+    });
+  }
+
+  if (catchmentLinks.length > 0) {
+    return catchmentLinks.map((p) => link(p.url, p.text, p.style)).join("");
+  }
+  return `<div>No EA Catchments Found</div>`;
+};
+
 const closePopup = () => {
   const popups = document.getElementsByClassName("mapboxgl-popup");
   for (const popup of popups) {
@@ -192,7 +240,8 @@ const hydroNodePropertiesToHTML = ({ properties }) => {
     Category: getLastURLSegment(properties.hydroNodeCategory),
   };
 
-  return basicPopupTableHTML("Hydro Node", displayProps);
+  return `${basicPopupTableHTML("Hydro Node", displayProps)}
+          ${hydroNodeCatchmentsLinks(properties)}`;
 };
 
 const watercourseLinkPropertiesToHTML = ({ properties }) => {
