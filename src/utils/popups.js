@@ -237,8 +237,11 @@ const sitePopupHTML = (title, displayProps, url, nearestLinksResponse) => {
 const hydroNodePropertiesToHTML = ({ properties }) => {
   const displayProps = {
     ID: properties.id,
-    Category: getLastURLSegment(properties.hydroNodeCategory),
   };
+
+  if (properties.hydroNodeCategory) {
+    displayProps["Category"] = getLastURLSegment(properties.hydroNodeCategory);
+  }
 
   return `${basicPopupTableHTML("Hydro Node", displayProps)}
           ${hydroNodeCatchmentsLinks(properties)}`;
