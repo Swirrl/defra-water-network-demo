@@ -16,9 +16,15 @@ REACT_APP_WATER_NETWORK_API_KEY
 - The Mapbox token is for [Mapbox GL JS](https://account.mapbox.com)
 - The Water Network API key is the base64-encoded basic auth token for the [Water Network API](https://defra-water-network-prod.publishmydata.com/water-network/)
 
+These can be placed in a file named `.env.development` in the root directory
+
 ## Development
 
 In the project directory, run:
+
+### `npm install`
+
+then
 
 ### `npm start`
 
